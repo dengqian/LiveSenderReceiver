@@ -185,7 +185,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
                }
                snd_size += ss;
             }
-            // cout<<rs<<"bytes data pushed"<<endl;
+            cout<<rs<<"bytes data pushed"<<endl;
          } 
         
       }
