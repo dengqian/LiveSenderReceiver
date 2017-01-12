@@ -13,7 +13,7 @@
 #include "cc.h"
 #include "test_util.h"
 
-tetst
+//test1
 using namespace std;
  
 #ifndef WIN32
