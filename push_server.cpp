@@ -234,6 +234,7 @@ void* pushdata(void* usocket)
 
        item* it = queue.pop_front();
        if(it->data != data_addr){
+           cout<<size<<" bytes data pushed" <<endl;
            char* data_pushed = data_addr;
            delete [] data_pushed;
            data_addr = it->data;
