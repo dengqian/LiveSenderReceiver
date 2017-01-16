@@ -36,6 +36,7 @@ UDTSOCKET receiver_sock;
 vector<UDTSOCKET> regist_sock_list;
 UDTSOCKET regist_sock;
 wqueue<item*> queue;
+int buff_size = 10240;
 
 
 void* recvdata(void *);
@@ -159,21 +160,20 @@ DWORD WINAPI recvdata(LPVOID usocket)
    UDTSOCKET client = *(UDTSOCKET*)usocket;
    delete (UDTSOCKET*)usocket;
 
-   int size = 10240;
-   char* data = new char[size];
    
 
    while (true)
    {
       int rsize = 0;
       int rs;
+      char* data = new char[buff_size];
 
-      while (rsize < size)
+      while (rsize < buff_size)
       {
          int rcv_size;
          int var_size = sizeof(int);
          UDT::getsockopt(receiver_sock, 0, UDT_RCVDATA, &rcv_size, &var_size);
-         if (UDT::ERROR == (rs = UDT::recv(client, data + rsize, size - rsize, 0)))
+         if (UDT::ERROR == (rs = UDT::recv(client, data + rsize, buff_size - rsize, 0)))
          {
             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
             break;
@@ -209,7 +209,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
       // add to shared buffer.
       // buffer.add(item);
 	
-      if (rsize < size)
+      if (rsize < buff_size)
          break;
    }
 
@@ -227,9 +227,18 @@ void* pushdata(void* usocket)
    UDTSOCKET client = *(UDTSOCKET*)usocket;
    delete (UDTSOCKET*)usocket;
 
+   int size = 0;
+   char* data_addr;
+
    while(queue.size() > 0){
 
        item* it = queue.pop_front();
+       if(it->data != data_addr){
+           char* data_pushed = data_addr;
+           delete [] data_pushed;
+           data_addr = it->data;
+
+       }
 
        int snd_size = 0;
        int ss = 0;
@@ -244,6 +253,7 @@ void* pushdata(void* usocket)
              return 0 ;
           }
           snd_size += ss;
+          size += ss;
        }
    }
 
