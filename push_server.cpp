@@ -36,6 +36,7 @@ UDTSOCKET receiver_sock;
 vector<UDTSOCKET> regist_sock_list;
 UDTSOCKET regist_sock;
 wqueue<item*> queue;
+
 int buff_size = 10240;
 
 
@@ -228,13 +229,14 @@ void* pushdata(void* usocket)
    delete (UDTSOCKET*)usocket;
 
    int size = 0;
-   char* data_addr;
+   char* data_addr = queue.front()->data;
 
-   while(queue.size() > 0){
+   while(true){
 
        item* it = queue.pop_front();
+
        if(it->data != data_addr){
-           cout<<size<<" bytes data pushed" <<endl;
+           cout<< "queue size:" << queue.size() << " " <<size<<" bytes data pushed" <<endl;
            char* data_pushed = data_addr;
            delete [] data_pushed;
            data_addr = it->data;

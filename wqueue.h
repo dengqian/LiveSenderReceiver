@@ -50,6 +50,16 @@ template <typename T> class wqueue
         pthread_cond_signal(&m_condv);
         pthread_mutex_unlock(&m_mutex);
     }
+    T front() {
+        pthread_mutex_lock(&m_mutex);
+        while (m_queue.size() == 0) {
+            pthread_cond_wait(&m_condv, &m_mutex);
+        }
+        T item = m_queue.front();
+        pthread_mutex_unlock(&m_mutex);
+        return item;
+    }
+    
     T pop_front() {
         pthread_mutex_lock(&m_mutex);
         while (m_queue.size() == 0) {
