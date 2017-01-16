@@ -12,21 +12,34 @@
 #include <vector>
 #include <iostream>
 #include <udt.h>
-#include <queue>
+
+#include "wqueue.h"
 
 #include "cc.h"
 #include "test_util.h"
+// #include "common.h"
 
 using namespace std;
 
+class item{
+public:
+    char * data;
+    int begin;
+    int end;
 
-// #include "common.h"
+    item(char* dat, int b, int e):data(dat),begin(b),end(e){}
+    ~item(){}
+};
+
 
 UDTSOCKET receiver_sock;
 vector<UDTSOCKET> regist_sock_list;
 UDTSOCKET regist_sock;
+wqueue<item*> queue;
+
 
 void* recvdata(void *);
+void* pushdata(void *);
 
 int listent_to_client(const char* port, UDTSOCKET& server)
 {
@@ -91,13 +104,13 @@ void* accept_viewer(void* usocket){
       getnameinfo((sockaddr *)&clientaddr, addrlen, clienthost, sizeof(clienthost), clientservice, sizeof(clientservice), NI_NUMERICHOST|NI_NUMERICSERV);
       cout << "new viewer: " << clienthost << ":" << clientservice << endl;
 
-      // #ifndef WIN32
-      //    pthread_t pushthread;
-      //    pthread_create(&pushthread, NULL, pushdata, new UDTSOCKET(regist));
-      //    pthread_detach(pushthread);
-      // #else
-      //    CreateThread(NULL, 0, pushdata, new UDTSOCKET(regist), 0, NULL);
-      // #endif
+      #ifndef WIN32
+         pthread_t pushthread;
+         pthread_create(&pushthread, NULL, pushdata, new UDTSOCKET(regist_sock));
+         pthread_join(pushthread, NULL);
+      #else
+         CreateThread(NULL, 0, pushdata, new UDTSOCKET(regist_sock), 0, NULL);
+      #endif
    }
 
     
@@ -165,8 +178,9 @@ DWORD WINAPI recvdata(LPVOID usocket)
             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
             break;
          }
-         rsize += rs;
 
+         /*
+          * send data directly.
          int snd_size = 0;
          int ss;
          // for(auto regist:regist_sock_list)
@@ -185,8 +199,10 @@ DWORD WINAPI recvdata(LPVOID usocket)
                snd_size += ss;
             }
             cout<<rs<<"bytes data pushed"<<endl;
-         } 
+         }*/ 
+         queue.add(new item(data, rsize, rsize+rs));
         
+         rsize += rs;
       }
 
 
@@ -204,6 +220,35 @@ DWORD WINAPI recvdata(LPVOID usocket)
    #else
       return 0;
    #endif
+}
+
+void* pushdata(void* usocket)
+{
+   UDTSOCKET client = *(UDTSOCKET*)usocket;
+   delete (UDTSOCKET*)usocket;
+
+   while(queue.size() > 0){
+
+       item* it = queue.pop_front();
+
+       int snd_size = 0;
+       int ss = 0;
+
+       while(snd_size < it->end-it->begin) {
+          
+          if (UDT::ERROR == (ss = UDT::send(client, \
+                         it->data+it->begin+snd_size, it->end-it->begin-snd_size, 0)))
+          {
+             cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
+             regist_sock_list.pop_back();
+             return 0 ;
+          }
+          snd_size += ss;
+       }
+   }
+
+   return 0;
+
 }
 
 
