@@ -124,8 +124,8 @@ int receive_from_client(UDTSOCKET serv)
    sockaddr_storage clientaddr;
    int addrlen = sizeof(clientaddr);
 
-   while (true)
-   {
+   // while (true) 
+   // {
       if (UDT::INVALID_SOCK == (receiver_sock = UDT::accept(serv, (sockaddr*)&clientaddr, &addrlen)))
       {
          cout << "accept: " << UDT::getlasterror().getErrorMessage() << endl;
@@ -144,7 +144,7 @@ int receive_from_client(UDTSOCKET serv)
       #else
          CreateThread(NULL, 0, recvdata, new UDTSOCKET(receiver_sock), 0, NULL);
       #endif
-   }
+   // }
 
    UDT::close(serv);
 
