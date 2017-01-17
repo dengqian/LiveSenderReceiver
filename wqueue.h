@@ -45,17 +45,10 @@ template <typename T> class wqueue
         pthread_cond_destroy(&m_condv);
     }
     void add(T item) {
-        // pthread_mutex_lock(&m_mutex);
+        pthread_mutex_lock(&m_mutex);
         m_queue.push_back(item);
         pthread_cond_signal(&m_condv);
-        // pthread_mutex_unlock(&m_mutex);
-    }
-    void pop(int end) {
-        //pthread_mutex_lock(&m_mutex);
-        for(int j=0; j<end; j++){
-            m_queue.pop_front();
-        }
-        //pthread_mutex_unlock(&m_mutex);
+        pthread_mutex_unlock(&m_mutex);
     }
     T front() {
         // pthread_mutex_lock(&m_mutex);
