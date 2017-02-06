@@ -1,0 +1,246 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ACKAction	cc.h	/^   virtual void ACKAction()$/;"	f	class:CTCP
+APP	Makefile	/^APP = appserver appclient sendfile recvfile test push_server sender receiver $/;"	m
+CCFLAGS	Makefile	/^CCFLAGS = -std=c++11 -Wall -D$(os) -I..\/src -I.\/kodo\/include -finline-functions -O3$/;"	m
+CTCP	cc.h	/^class CTCP: public CCC$/;"	c
+CUDPBlast	cc.h	/^   CUDPBlast()$/;"	f	class:CUDPBlast
+CUDPBlast	cc.h	/^class CUDPBlast: public CCC$/;"	c
+DIR	Makefile	/^DIR = $(shell pwd)$/;"	m
+DupACKAction	cc.h	/^   virtual void DupACKAction()$/;"	f	class:CTCP
+KODOC_API	kodo/include/kodoc/kodoc.h	13;"	d
+KODOC_API	kodo/include/kodoc/kodoc.h	16;"	d
+KODOC_API	kodo/include/kodoc/kodoc.h	19;"	d
+KODOC_API	kodo/include/kodoc/kodoc.h	27;"	d
+KODOC_API	kodo/include/kodoc/kodoc.h	29;"	d
+KODOFLAGS	Makefile	/^KODOFLAGS =  -Wl,-Bdynamic -lkodoc -Wl,-rpath .$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS = -std=c++11 -L..\/src -L.\/kodo -ludt -lpthread -lm$/;"	m
+MAX_CLIENT	common.h	4;"	d
+RECV_BUFF_SIZE	common.h	5;"	d
+Test_1_Cli	test.cpp	/^void* Test_1_Cli(void* param)$/;"	f
+Test_1_Srv	test.cpp	/^void* Test_1_Srv(void* param)$/;"	f
+Test_2_Cli	test.cpp	/^void* Test_2_Cli(void* param)$/;"	f
+Test_2_Srv	test.cpp	/^void* Test_2_Srv(void* param)$/;"	f
+Test_3_Cli	test.cpp	/^void* Test_3_Cli(void* param)$/;"	f
+Test_3_Srv	test.cpp	/^void* Test_3_Srv(void* param)$/;"	f
+Test_4_Cli	test.cpp	/^void* Test_4_Cli(void*)$/;"	f
+Test_4_Srv	test.cpp	/^void* Test_4_Srv(void* param)$/;"	f
+UDTUpDown	test_util.h	/^   UDTUpDown()$/;"	f	struct:UDTUpDown
+UDTUpDown	test_util.h	/^struct UDTUpDown{$/;"	s
+_KODO_DECODE_	kodo/decode.h	2;"	d
+_KODO_ENCODE_	kodo/encode.h	2;"	d
+_PUSH_COMMON_H_	common.h	2;"	d
+_UDT_TEST_UTIL_H_	test_util.h	2;"	d
+__wqueue_h__	wqueue.h	25;"	d
+accept_viewer	push_server.cpp	/^void* accept_viewer(void* usocket){$/;"	f
+add	wqueue.h	/^    void add(T item) {$/;"	f	class:wqueue
+arch	Makefile	/^   arch = IA32$/;"	m
+begin	push_server.cpp	/^    int begin;$/;"	m	class:item	file:
+binary	kodo/include/kodocpp/field.hpp	/^    binary = kodoc_binary,$/;"	m	class:kodocpp::field
+binary4	kodo/include/kodocpp/field.hpp	/^    binary4 = kodoc_binary4,$/;"	m	class:kodocpp::field
+binary8	kodo/include/kodocpp/field.hpp	/^    binary8 = kodoc_binary8$/;"	m	class:kodocpp::field
+block_size	kodo/include/kodocpp/coder.hpp	/^    uint32_t block_size() const$/;"	f	class:kodocpp::coder
+build	kodo/include/kodocpp/decoder_factory.hpp	/^    coder_type build()$/;"	f	class:kodocpp::decoder_factory
+build	kodo/include/kodocpp/encoder_factory.hpp	/^    coder_type build()$/;"	f	class:kodocpp::encoder_factory
+cloud_server1	receiver.cpp	/^const char* cloud_server1 = "139.199.94.164";$/;"	v
+cloud_server1	sender.cpp	/^const char cloud_server1[] = "139.199.94.164";$/;"	v
+cloud_server2	receiver.cpp	/^const char* cloud_server2 = "139.199.165.244";$/;"	v
+cloud_server2	sender.cpp	/^const char cloud_server2[] = "139.199.165.244";$/;"	v
+cloud_server_port	receiver.cpp	/^const char* cloud_server_port = "9000";$/;"	v
+cloud_server_port	sender.cpp	/^const char cloud_server_port[] = "9090";$/;"	v
+codec	kodo/include/kodocpp/codec.hpp	/^enum class codec: int32_t$/;"	c	namespace:kodocpp
+coder	kodo/include/kodocpp/coder.hpp	/^    coder(kodoc_coder_t coder, std::function<void(kodoc_coder_t)> deleter) :$/;"	f	class:kodocpp::coder
+coder	kodo/include/kodocpp/coder.hpp	/^class coder$/;"	c	namespace:kodocpp
+coefficient_vector_size	kodo/include/kodocpp/coder.hpp	/^    uint32_t coefficient_vector_size() const$/;"	f	class:kodocpp::coder
+connect	receiver.cpp	/^int connect(UDTSOCKET& usock, const char *server_ip, const char* port)$/;"	f
+connect	sender.cpp	/^int connect(UDTSOCKET& usock, const char *server_ip, const char* port)$/;"	f
+connect	test.cpp	/^int connect(UDTSOCKET& usock, int port)$/;"	f
+createTCPSocket	test.cpp	/^int createTCPSocket(SYSSOCKET& ssock, int port = 0, bool rendezvous = false)$/;"	f
+createUDTSocket	receiver.cpp	/^int createUDTSocket(UDTSOCKET& usock, const char* server_ip, const char* server_port)$/;"	f
+createUDTSocket	sender.cpp	/^int createUDTSocket(UDTSOCKET& usock, const char* server_ip, const char* server_port)$/;"	f
+createUDTSocket	test.cpp	/^int createUDTSocket(UDTSOCKET& usock, int port = 0, bool rendezvous = false)$/;"	f
+data	push_server.cpp	/^    char * data;$/;"	m	class:item	file:
+decode	kodo/decode.h	/^const char* decode(uint8_t* data_in, uint32_t length) $/;"	f
+decoder	kodo/include/kodocpp/decoder.hpp	/^    decoder(kodoc_coder_t coder_instance = 0) :$/;"	f	class:kodocpp::decoder
+decoder	kodo/include/kodocpp/decoder.hpp	/^class decoder: public coder$/;"	c	namespace:kodocpp
+decoder_factory	kodo/include/kodocpp/decoder_factory.hpp	/^    decoder_factory(codec codec, field field,$/;"	f	class:kodocpp::decoder_factory
+decoder_factory	kodo/include/kodocpp/decoder_factory.hpp	/^class decoder_factory : public factory$/;"	c	namespace:kodocpp
+density	kodo/include/kodocpp/encoder.hpp	/^    double density() const$/;"	f	class:kodocpp::encoder
+encode	kodo/encode.h	/^const char* encode(uint8_t* data, int size)$/;"	f
+encoder	kodo/include/kodocpp/encoder.hpp	/^    encoder(kodoc_coder_t coder_instance = 0) :$/;"	f	class:kodocpp::encoder
+encoder	kodo/include/kodocpp/encoder.hpp	/^class encoder: public coder$/;"	c	namespace:kodocpp
+encoder_factory	kodo/include/kodocpp/encoder_factory.hpp	/^    encoder_factory(codec codec, field field,$/;"	f	class:kodocpp::encoder_factory
+encoder_factory	kodo/include/kodocpp/encoder_factory.hpp	/^class encoder_factory : public factory$/;"	c	namespace:kodocpp
+end	push_server.cpp	/^    int end;$/;"	m	class:item	file:
+expansion	kodo/include/kodocpp/coder.hpp	/^    uint32_t expansion() const$/;"	f	class:kodocpp::coder
+factory	kodo/include/kodocpp/factory.hpp	/^    factory(kodoc_factory_t factory,$/;"	f	class:kodocpp::factory
+factory	kodo/include/kodocpp/factory.hpp	/^class factory$/;"	c	namespace:kodocpp
+feedback_size	kodo/include/kodocpp/coder.hpp	/^    uint32_t feedback_size() const$/;"	f	class:kodocpp::coder
+field	kodo/include/kodocpp/field.hpp	/^enum class field: int32_t$/;"	c	namespace:kodocpp
+fulcrum	kodo/include/kodocpp/codec.hpp	/^    fulcrum = kodoc_fulcrum,$/;"	m	class:kodocpp::codec
+full_vector	kodo/include/kodocpp/codec.hpp	/^    full_vector = kodoc_full_vector,$/;"	m	class:kodocpp::codec
+g_ActualUDTNum	test.cpp	/^int g_ActualUDTNum = 0;$/;"	v
+g_IP_Version	test.cpp	/^const int g_IP_Version = AF_INET;$/;"	v
+g_IndUDTNum	test.cpp	/^const int g_IndUDTNum = 100;  \/\/ must < g_UDTNum.$/;"	v
+g_Localhost	test.cpp	/^const char g_Localhost[] = "127.0.0.1";$/;"	v
+g_Server_Port	test.cpp	/^const int g_Server_Port = 9000;$/;"	v
+g_Socket_Type	test.cpp	/^const int g_Socket_Type = SOCK_STREAM;$/;"	v
+g_TCPNum	test.cpp	/^const int g_TCPNum = 10;$/;"	v
+g_TotalNum	test.cpp	/^const int g_TotalNum = 10000;$/;"	v
+g_UDTNum	test.cpp	/^const int g_UDTNum = 200;$/;"	v
+g_UDTNum3	test.cpp	/^const int g_UDTNum3 = 50;$/;"	v
+g_UDTNum4	test.cpp	/^const int g_UDTNum4 = 1000;$/;"	v
+g_UDTPerThread	test.cpp	/^const int g_UDTPerThread = 25;$/;"	v
+g_UDTThreads	test.cpp	/^const int g_UDTThreads = 40;$/;"	v
+g_serverNum	receiver.cpp	/^const int g_serverNum = 2;  \/\/ num of cloud server$/;"	v
+g_serverNum	sender.cpp	/^const int g_serverNum = 2;  \/\/ num of cloud server$/;"	v
+has_codec	kodo/include/kodocpp/codec.hpp	/^inline bool has_codec(codec codec)$/;"	f	class:kodocpp::codec
+has_feedback_size	kodo/include/kodocpp/coder.hpp	/^    bool has_feedback_size() const$/;"	f	class:kodocpp::coder
+has_partial_decoding_interface	kodo/include/kodocpp/decoder.hpp	/^    bool has_partial_decoding_interface() const$/;"	f	class:kodocpp::decoder
+has_symbol_decoding_status_updater_interface	kodo/include/kodocpp/decoder.hpp	/^    bool has_symbol_decoding_status_updater_interface() const$/;"	f	class:kodocpp::decoder
+has_systematic_interface	kodo/include/kodocpp/encoder.hpp	/^    bool has_systematic_interface() const$/;"	f	class:kodocpp::encoder
+has_trace_interface	kodo/include/kodocpp/coder.hpp	/^    bool has_trace_interface() const$/;"	f	class:kodocpp::coder
+has_write_payload	kodo/include/kodocpp/coder.hpp	/^    bool has_write_payload()$/;"	f	class:kodocpp::coder
+init	cc.h	/^   void init()$/;"	f	class:CTCP
+inner_symbols	kodo/include/kodocpp/coder.hpp	/^    uint32_t inner_symbols() const$/;"	f	class:kodocpp::coder
+is_complete	kodo/include/kodocpp/decoder.hpp	/^    bool is_complete() const$/;"	f	class:kodocpp::decoder
+is_partially_complete	kodo/include/kodocpp/decoder.hpp	/^    bool is_partially_complete() const$/;"	f	class:kodocpp::decoder
+is_status_updater_enabled	kodo/include/kodocpp/decoder.hpp	/^    bool is_status_updater_enabled()$/;"	f	class:kodocpp::decoder
+is_symbol_missing	kodo/include/kodocpp/decoder.hpp	/^    bool is_symbol_missing(uint32_t index)$/;"	f	class:kodocpp::decoder
+is_symbol_partially_decoded	kodo/include/kodocpp/decoder.hpp	/^    bool is_symbol_partially_decoded(uint32_t index)$/;"	f	class:kodocpp::decoder
+is_symbol_pivot	kodo/include/kodocpp/decoder.hpp	/^    bool is_symbol_pivot(uint32_t index) const$/;"	f	class:kodocpp::decoder
+is_symbol_uncoded	kodo/include/kodocpp/decoder.hpp	/^    bool is_symbol_uncoded(uint32_t index) const$/;"	f	class:kodocpp::decoder
+is_systematic_on	kodo/include/kodocpp/encoder.hpp	/^    bool is_systematic_on() const$/;"	f	class:kodocpp::encoder
+item	push_server.cpp	/^    item(char* dat, int b, int e):data(dat),begin(b),end(e){}$/;"	f	class:item
+item	push_server.cpp	/^class item{$/;"	c	file:
+kodoc_binary	kodo/include/kodoc/kodoc.h	/^    kodoc_binary,$/;"	e	enum:__anon1
+kodoc_binary4	kodo/include/kodoc/kodoc.h	/^    kodoc_binary4,$/;"	e	enum:__anon1
+kodoc_binary8	kodo/include/kodoc/kodoc.h	/^    kodoc_binary8$/;"	e	enum:__anon1
+kodoc_codec	kodo/include/kodoc/kodoc.h	/^kodoc_codec;$/;"	t	typeref:enum:__anon2
+kodoc_coder_t	kodo/include/kodoc/kodoc.h	/^typedef struct kodoc_coder* kodoc_coder_t;$/;"	t	typeref:struct:kodoc_coder
+kodoc_factory_t	kodo/include/kodoc/kodoc.h	/^typedef struct kodoc_factory* kodoc_factory_t;$/;"	t	typeref:struct:kodoc_factory
+kodoc_finite_field	kodo/include/kodoc/kodoc.h	/^kodoc_finite_field;$/;"	t	typeref:enum:__anon1
+kodoc_fulcrum	kodo/include/kodoc/kodoc.h	/^    kodoc_fulcrum,$/;"	e	enum:__anon2
+kodoc_full_vector	kodo/include/kodoc/kodoc.h	/^    kodoc_full_vector,$/;"	e	enum:__anon2
+kodoc_on_the_fly	kodo/include/kodoc/kodoc.h	/^    kodoc_on_the_fly,$/;"	e	enum:__anon2
+kodoc_perpetual	kodo/include/kodoc/kodoc.h	/^    kodoc_perpetual,$/;"	e	enum:__anon2
+kodoc_reed_solomon	kodo/include/kodoc/kodoc.h	/^    kodoc_reed_solomon$/;"	e	enum:__anon2
+kodoc_seed	kodo/include/kodoc/kodoc.h	/^    kodoc_seed,$/;"	e	enum:__anon2
+kodoc_sliding_window	kodo/include/kodoc/kodoc.h	/^    kodoc_sliding_window,$/;"	e	enum:__anon2
+kodoc_sparse_full_vector	kodo/include/kodoc/kodoc.h	/^    kodoc_sparse_full_vector,$/;"	e	enum:__anon2
+kodoc_sparse_seed	kodo/include/kodoc/kodoc.h	/^    kodoc_sparse_seed,$/;"	e	enum:__anon2
+kodoc_trace_callback_t	kodo/include/kodoc/kodoc.h	/^typedef void (*kodoc_trace_callback_t)(const char*, const char*, void*);$/;"	t
+kodocpp	kodo/include/kodocpp/codec.hpp	/^namespace kodocpp$/;"	n
+kodocpp	kodo/include/kodocpp/coder.hpp	/^namespace kodocpp$/;"	n
+kodocpp	kodo/include/kodocpp/decoder.hpp	/^namespace kodocpp$/;"	n
+kodocpp	kodo/include/kodocpp/decoder_factory.hpp	/^namespace kodocpp$/;"	n
+kodocpp	kodo/include/kodocpp/encoder.hpp	/^namespace kodocpp$/;"	n
+kodocpp	kodo/include/kodocpp/encoder_factory.hpp	/^namespace kodocpp$/;"	n
+kodocpp	kodo/include/kodocpp/factory.hpp	/^namespace kodocpp$/;"	n
+kodocpp	kodo/include/kodocpp/field.hpp	/^namespace kodocpp$/;"	n
+listent_to_client	push_server.cpp	/^int listent_to_client(const char* port, UDTSOCKET& server)$/;"	f
+m_bSlowStart	cc.h	/^   bool m_bSlowStart;$/;"	m	class:CTCP
+m_callback	kodo/include/kodocpp/coder.hpp	/^    std::shared_ptr<callback_type> m_callback;$/;"	m	class:kodocpp::coder
+m_coder	kodo/include/kodocpp/coder.hpp	/^    std::shared_ptr<kodoc_coder> m_coder;$/;"	m	class:kodocpp::coder
+m_condv	wqueue.h	/^    pthread_cond_t   m_condv; $/;"	m	class:wqueue
+m_factory	kodo/include/kodocpp/factory.hpp	/^    std::shared_ptr<kodoc_factory> m_factory;$/;"	m	class:kodocpp::factory
+m_iDupACKCount	cc.h	/^   int m_iDupACKCount;$/;"	m	class:CTCP
+m_iLastACK	cc.h	/^   int m_iLastACK;$/;"	m	class:CTCP
+m_issthresh	cc.h	/^   int m_issthresh;$/;"	m	class:CTCP
+m_mutex	wqueue.h	/^    pthread_mutex_t  m_mutex;$/;"	m	class:wqueue
+m_queue	wqueue.h	/^    list<T>          m_queue;$/;"	m	class:wqueue
+main	appclient.cpp	/^int main(int argc, char* argv[])$/;"	f
+main	appserver.cpp	/^int main(int argc, char* argv[])$/;"	f
+main	kodo/encode.cpp	/^int main(){$/;"	f
+main	push_server.cpp	/^int main(int argc, char* argv[]){$/;"	f
+main	receiver.cpp	/^int main(int argc, char* argv[])$/;"	f
+main	recvfile.cpp	/^int main(int argc, char* argv[])$/;"	f
+main	sender.cpp	/^int main(int argc, char* argv[])$/;"	f
+main	sendfile.cpp	/^int main(int argc, char* argv[])$/;"	f
+main	test.cpp	/^int main()$/;"	f
+max_block_size	kodo/include/kodocpp/factory.hpp	/^    uint32_t max_block_size() const$/;"	f	class:kodocpp::factory
+max_expansion	kodo/include/kodocpp/factory.hpp	/^    uint32_t max_expansion() const$/;"	f	class:kodocpp::factory
+max_inner_symbols	kodo/include/kodocpp/factory.hpp	/^    uint32_t max_inner_symbols() const$/;"	f	class:kodocpp::factory
+max_payload_size	kodo/include/kodocpp/factory.hpp	/^    uint32_t max_payload_size() const$/;"	f	class:kodocpp::factory
+max_symbol_size	kodo/include/kodocpp/factory.hpp	/^    uint32_t max_symbol_size() const$/;"	f	class:kodocpp::factory
+max_symbols	kodo/include/kodocpp/factory.hpp	/^    uint32_t max_symbols() const$/;"	f	class:kodocpp::factory
+monitor	appclient.cpp	/^void* monitor(void* s)$/;"	f
+monitor	receiver.cpp	/^void* monitor(void* s)$/;"	f
+monitor	sender.cpp	/^void* monitor(void* s)$/;"	f
+nested_symbol_size	kodo/include/kodocpp/encoder.hpp	/^    uint32_t nested_symbol_size()$/;"	f	class:kodocpp::encoder
+nested_symbols	kodo/include/kodocpp/encoder.hpp	/^    uint32_t nested_symbols()$/;"	f	class:kodocpp::encoder
+onACK	cc.h	/^   virtual void onACK(int ack)$/;"	f	class:CTCP
+onTimeout	cc.h	/^   virtual void onTimeout()$/;"	f	class:CTCP
+on_the_fly	kodo/include/kodocpp/codec.hpp	/^    on_the_fly = kodoc_on_the_fly,$/;"	m	class:kodocpp::codec
+os	Makefile	/^   os = LINUX$/;"	m
+payload_size	kodo/include/kodocpp/coder.hpp	/^    uint32_t payload_size() const$/;"	f	class:kodocpp::coder
+perpetual	kodo/include/kodocpp/codec.hpp	/^    perpetual = kodoc_perpetual,$/;"	m	class:kodocpp::codec
+pop_front	wqueue.h	/^    T pop_front() {$/;"	f	class:wqueue
+pre_charging	kodo/include/kodocpp/encoder.hpp	/^    bool pre_charging() const$/;"	f	class:kodocpp::encoder
+pseudo_systematic	kodo/include/kodocpp/encoder.hpp	/^    bool pseudo_systematic() const$/;"	f	class:kodocpp::encoder
+pushdata	push_server.cpp	/^void* pushdata(void* usocket)$/;"	f
+queue	push_server.cpp	/^wqueue<item*> queue;$/;"	v
+rank	kodo/include/kodocpp/coder.hpp	/^    uint32_t rank() const$/;"	f	class:kodocpp::coder
+read_feedback	kodo/include/kodocpp/encoder.hpp	/^    void read_feedback(uint8_t* feedback)$/;"	f	class:kodocpp::encoder
+read_payload	kodo/include/kodocpp/decoder.hpp	/^    void read_payload(uint8_t* payload)$/;"	f	class:kodocpp::decoder
+read_symbol	kodo/include/kodocpp/decoder.hpp	/^    void read_symbol(uint8_t* symbol_data, uint8_t* coefficients)$/;"	f	class:kodocpp::decoder
+read_uncoded_symbol	kodo/include/kodocpp/decoder.hpp	/^    void read_uncoded_symbol(uint8_t* symbol_data, uint32_t index)$/;"	f	class:kodocpp::decoder
+receive_from_client	push_server.cpp	/^int receive_from_client(UDTSOCKET serv)$/;"	f
+receiver_sock	push_server.cpp	/^UDTSOCKET receiver_sock;$/;"	v
+recvdata	appserver.cpp	/^void* recvdata(void* usocket)$/;"	f
+recvdata	push_server.cpp	/^void* recvdata(void* usocket)$/;"	f
+recvdata	receiver.cpp	/^void* recvdata(void* usocket)$/;"	f
+reed_solomon	kodo/include/kodocpp/codec.hpp	/^    reed_solomon = kodoc_reed_solomon$/;"	m	class:kodocpp::codec
+regist_sock	push_server.cpp	/^UDTSOCKET regist_sock;$/;"	v
+regist_sock_list	push_server.cpp	/^vector<UDTSOCKET> regist_sock_list;$/;"	v
+rx_packets	kodo/decode.h	/^unsigned int rx_packets;$/;"	v
+seed	kodo/include/kodocpp/codec.hpp	/^    seed = kodoc_seed,$/;"	m	class:kodocpp::codec
+sendfile	sendfile.cpp	/^void* sendfile(void* usocket)$/;"	f
+setRate	cc.h	/^   void setRate(double mbps)$/;"	f	class:CUDPBlast
+set_const_symbol	kodo/include/kodocpp/encoder.hpp	/^    void set_const_symbol(uint32_t index, uint8_t* data, uint32_t size)$/;"	f	class:kodocpp::encoder
+set_const_symbols	kodo/include/kodocpp/encoder.hpp	/^    void set_const_symbols(uint8_t* data, uint32_t size)$/;"	f	class:kodocpp::encoder
+set_density	kodo/include/kodocpp/encoder.hpp	/^    void set_density(double density)$/;"	f	class:kodocpp::encoder
+set_expansion	kodo/include/kodocpp/factory.hpp	/^    void set_expansion(uint32_t expansion)$/;"	f	class:kodocpp::factory
+set_mutable_symbol	kodo/include/kodocpp/decoder.hpp	/^    void set_mutable_symbol(uint32_t index, uint8_t* data, uint32_t size)$/;"	f	class:kodocpp::decoder
+set_mutable_symbols	kodo/include/kodocpp/decoder.hpp	/^    void set_mutable_symbols(uint8_t* data, uint32_t size)$/;"	f	class:kodocpp::decoder
+set_pre_charging	kodo/include/kodocpp/encoder.hpp	/^    void set_pre_charging(bool pre_charging)$/;"	f	class:kodocpp::encoder
+set_pseudo_systematic	kodo/include/kodocpp/encoder.hpp	/^    void set_pseudo_systematic(bool pseudo_systematic)$/;"	f	class:kodocpp::encoder
+set_status_updater_off	kodo/include/kodocpp/decoder.hpp	/^    void set_status_updater_off()$/;"	f	class:kodocpp::decoder
+set_status_updater_on	kodo/include/kodocpp/decoder.hpp	/^    void set_status_updater_on()$/;"	f	class:kodocpp::decoder
+set_symbol_size	kodo/include/kodocpp/factory.hpp	/^    void set_symbol_size(uint32_t symbol_size)$/;"	f	class:kodocpp::factory
+set_symbols	kodo/include/kodocpp/factory.hpp	/^    void set_symbols(uint32_t symbols)$/;"	f	class:kodocpp::factory
+set_systematic_off	kodo/include/kodocpp/encoder.hpp	/^    void set_systematic_off()$/;"	f	class:kodocpp::encoder
+set_systematic_on	kodo/include/kodocpp/encoder.hpp	/^    void set_systematic_on()$/;"	f	class:kodocpp::encoder
+set_trace_callback	kodo/include/kodocpp/coder.hpp	/^    void set_trace_callback(callback_type callback)$/;"	f	class:kodocpp::coder
+set_trace_off	kodo/include/kodocpp/coder.hpp	/^    void set_trace_off()$/;"	f	class:kodocpp::coder
+set_trace_stdout	kodo/include/kodocpp/coder.hpp	/^    void set_trace_stdout()$/;"	f	class:kodocpp::coder
+set_width	kodo/include/kodocpp/encoder.hpp	/^    void set_width(uint32_t width)$/;"	f	class:kodocpp::encoder
+set_width_ratio	kodo/include/kodocpp/encoder.hpp	/^    void set_width_ratio(double width_ratio)$/;"	f	class:kodocpp::encoder
+set_zone_prefix	kodo/include/kodocpp/coder.hpp	/^    void set_zone_prefix(const std::string& prefix)$/;"	f	class:kodocpp::coder
+size	wqueue.h	/^    int size() {$/;"	f	class:wqueue
+sliding_window	kodo/include/kodocpp/codec.hpp	/^    sliding_window = kodoc_sliding_window,$/;"	m	class:kodocpp::codec
+sparse_full_vector	kodo/include/kodocpp/codec.hpp	/^    sparse_full_vector = kodoc_sparse_full_vector,$/;"	m	class:kodocpp::codec
+sparse_seed	kodo/include/kodocpp/codec.hpp	/^    sparse_seed = kodoc_sparse_seed,$/;"	m	class:kodocpp::codec
+start_and_destroy_clients	test.cpp	/^void* start_and_destroy_clients(void* param)$/;"	f
+symbol_size	kodo/include/kodocpp/coder.hpp	/^    uint32_t symbol_size() const$/;"	f	class:kodocpp::coder
+symbols	kodo/include/kodocpp/coder.hpp	/^    uint32_t symbols() const$/;"	f	class:kodocpp::coder
+symbols_missing	kodo/include/kodocpp/decoder.hpp	/^    uint32_t symbols_missing()$/;"	f	class:kodocpp::decoder
+symbols_partially_decoded	kodo/include/kodocpp/decoder.hpp	/^    uint32_t symbols_partially_decoded() const$/;"	f	class:kodocpp::decoder
+symbols_uncoded	kodo/include/kodocpp/decoder.hpp	/^    uint32_t symbols_uncoded() const$/;"	f	class:kodocpp::decoder
+tcp_connect	test.cpp	/^int tcp_connect(SYSSOCKET& ssock, int port)$/;"	f
+update_symbol_status	kodo/include/kodocpp/decoder.hpp	/^    void update_symbol_status()$/;"	f	class:kodocpp::decoder
+width	kodo/include/kodocpp/encoder.hpp	/^    uint32_t width() const$/;"	f	class:kodocpp::encoder
+width_ratio	kodo/include/kodocpp/encoder.hpp	/^    double width_ratio() const$/;"	f	class:kodocpp::encoder
+wqueue	wqueue.h	/^    wqueue() {$/;"	f	class:wqueue
+wqueue	wqueue.h	/^template <typename T> class wqueue$/;"	c
+write_feedback	kodo/include/kodocpp/decoder.hpp	/^    void write_feedback(uint8_t* feedback)$/;"	f	class:kodocpp::decoder
+write_payload	kodo/include/kodocpp/coder.hpp	/^    uint32_t write_payload(uint8_t* payload)$/;"	f	class:kodocpp::coder
+write_symbol	kodo/include/kodocpp/encoder.hpp	/^    uint32_t write_symbol(uint8_t* symbol_data, uint8_t* coefficients)$/;"	f	class:kodocpp::encoder
+write_uncoded_symbol	kodo/include/kodocpp/encoder.hpp	/^    uint32_t write_uncoded_symbol(uint8_t* symbol_data, uint32_t index)$/;"	f	class:kodocpp::encoder
+~UDTUpDown	test_util.h	/^   ~UDTUpDown()$/;"	f	struct:UDTUpDown
+~item	push_server.cpp	/^    ~item(){}$/;"	f	class:item
+~wqueue	wqueue.h	/^    ~wqueue() {$/;"	f	class:wqueue

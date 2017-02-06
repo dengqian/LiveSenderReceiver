@@ -48,6 +48,9 @@ KODOFLAGS =  -Wl,-Bdynamic -lkodoc -Wl,-rpath .
 %.o: %.cpp
 	$(C++) $(CCFLAGS) $< -c
 
+# serder.cpp: kodo/encoder.h
+# receiver.cpp: kodo/decoder.h
+
 appserver: appserver.o
 	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
 appclient: appclient.o
@@ -61,9 +64,9 @@ test: test.o
 push_server: push_server.o
 	$(C++) $^ -o $@ $(LDFLAGS)
 sender: sender.o
-	$(C++) $^ -o $@ $(LDFLAGS)
+	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
 receiver: receiver.o
-	$(C++) $^ -o $@ $(LDFLAGS)
+	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
 	
 clean:
 	rm -f *.o $(APP)

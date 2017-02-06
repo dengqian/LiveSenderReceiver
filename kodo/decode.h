@@ -60,7 +60,6 @@ const char* decode(uint8_t* data_in, uint32_t length)
         // Receive message
         // remote_address_size = sizeof(remote_address);
         memcpy(payload.data(), data_in+offset, payload_size); 
-        // std::cout<<payload.data()<<std::endl;
         offset += payload_size;
 
         // bytes_received = recvfrom(
@@ -74,31 +73,36 @@ const char* decode(uint8_t* data_in, uint32_t length)
         //     continue;
         // }
 
+        // // Print received message
+        // printf("UDP packet received from %s:%u : %d bytes\n",
+        //        inet_ntoa(remote_address.sin_addr),
+        //        ntohs(remote_address.sin_port), bytes_received);
 
         // ++rx_packets;
 
         // Packet got through - pass that packet to the decoder
         decoder.read_payload(payload.data());
 
-        // if (decoder.has_partial_decoding_interface() &&
-        //     decoder.is_partially_complete())
-        // {
-        //     for (uint32_t i = 0; i < decoder.symbols(); ++i)
-        //     {
-        //         if (!decoded[i] && decoder.is_symbol_uncoded(i))
-        //         {
-        //             // Update that this symbol has been decoded,
-        //             // in a real application we could process that symbol
-        //             printf("Symbol %d was decoded\n", i);
-        //             decoded[i] = true;
-        //         }
-        //     }
-        // }
+        if (decoder.has_partial_decoding_interface() &&
+            decoder.is_partially_complete())
+        {
+            for (uint32_t i = 0; i < decoder.symbols(); ++i)
+            {
+                if (!decoded[i] && decoder.is_symbol_uncoded(i))
+                {
+                    // Update that this symbol has been decoded,
+                    // in a real application we could process that symbol
+                    printf("Symbol %d was decoded\n", i);
+                    decoded[i] = true;
+                }
+            }
+        }
+        std::cout<<payload.data()<<std::endl;
         payload.clear();
     }
 
     printf("Data decoded!\n");
-    std::cout<<data_out.size()<<' '<<data_out.data()<<'\n';
+    std::cout<<data_out.data()<<'\n';
 
     return (const char*)data_out.data();
 
