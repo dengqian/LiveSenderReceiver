@@ -14,14 +14,8 @@
 // Count the total number of packets received in order to decode
 unsigned int rx_packets;
 
-// static void exit_on_sigint(int sig)
-// {
-//     (void) sig;
-//     printf("\nTotal number of received packets: %d\n", rx_packets);
-//     exit(0);
-// }
 
-const char* decode(uint8_t* data_in, uint32_t length) 
+int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, uint32_t length) 
 {
 
 
@@ -43,16 +37,15 @@ const char* decode(uint8_t* data_in, uint32_t length)
     std::vector<uint8_t> payload(payload_size);
 
     // Set the storage for the decoder
-    std::cout<<decoder.block_size()<<'\n';
-    std::vector<uint8_t> data_out(decoder.block_size());
+    // std::cout<<decoder.block_size()<<'\n';
+    // std::vector<uint8_t> data_out(decoder.block_size());
+    data_out.resize(decoder.block_size());
     decoder.set_mutable_symbols(data_out.data(), decoder.block_size());
 
     // Keeps track of which symbols have been decoded
     std::vector<bool> decoded(symbols, false);
 
-
-	
-    uint32_t offset = 0;
+    uint32_t offset = 1;
 
     // Receiver loop
     while (!decoder.is_complete())
@@ -61,7 +54,7 @@ const char* decode(uint8_t* data_in, uint32_t length)
         // remote_address_size = sizeof(remote_address);
         memcpy(payload.data(), data_in+offset, payload_size); 
         // std::cout<<payload.data()<<std::endl;
-        offset += payload_size;
+        offset = offset+payload_size+1;
 
         // bytes_received = recvfrom(
         //     socket_descriptor, (char*)payload.data(), payload_size, 0,
@@ -97,10 +90,10 @@ const char* decode(uint8_t* data_in, uint32_t length)
         payload.clear();
     }
 
-    printf("Data decoded!\n");
+    printf("Data decoded!");
     std::cout<<data_out.size()<<' '<<data_out.data()<<'\n';
 
-    return (const char*)data_out.data();
+    return 0; 
 
 }
 
