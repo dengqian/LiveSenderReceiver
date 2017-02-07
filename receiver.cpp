@@ -103,10 +103,16 @@ int main(int argc, char* argv[])
    connect(client2, cloud_server2, cloud_server_port);
    
    #ifndef WIN32
+      pthread_create(new pthread_t, NULL, monitor, &client2);
+   #else
+      CreateThread(NULL, 0, monitor, &client2, 0, NULL);
+   #endif
+
+   #ifndef WIN32
       pthread_t rcvthread1, rcvthread2;
       pthread_create(&rcvthread1, NULL, recvdata, new UDTSOCKET(client1));
-      pthread_create(&rcvthread2, NULL, recvdata, new UDTSOCKET(client2));
       pthread_join(rcvthread1, NULL);
+      pthread_create(&rcvthread2, NULL, recvdata, new UDTSOCKET(client2));
       pthread_join(rcvthread2, NULL);
    #else
       CreateThread(NULL, 0, recvdata, new UDTSOCKET(recver), 0, NULL);
@@ -129,7 +135,7 @@ DWORD WINAPI monitor(LPVOID s)
 
    UDT::TRACEINFO perf;
 
-   cout << "SendRate(Mb/s)\tRTT(ms)\tFlowWnd\tCWnd\tPktSndPeriod(us)\tRecvACK\tRecvNAK" << endl;
+   cout << "RecvRate(Mb/s)\tRTT(ms)\tFlowWnd\tCWnd\tPktSndPeriod(us)\tRecvACK\tRecvNAK" << endl;
 
    while (true)
    {
@@ -145,7 +151,7 @@ DWORD WINAPI monitor(LPVOID s)
          break;
       }
 
-      cout << perf.mbpsSendRate << "\t\t" 
+      cout << perf.mbpsRecvRate << "\t\t" 
            << perf.msRTT << "\t" 
            << perf.pktFlowWindow << "\t" 
            << perf.pktCongestionWindow << "\t" 
@@ -174,6 +180,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
    char* data;
    int size = 10240;
    data = new char[size];
+   int total = 0;
 
    while (true)
    {
@@ -191,7 +198,8 @@ DWORD WINAPI recvdata(LPVOID usocket)
             break;
          }
 
-         cout<<rs<<"bytes data rcvd"<<endl;
+         total += rs;
+         // cout<< total <<"bytes data rcvd"<<endl;
 
          rsize += rs;
       }

@@ -31,6 +31,7 @@ public:
     ~item(){}
 };
 
+
 UDTSOCKET receiver_sock;
 vector<UDTSOCKET> regist_sock_list;
 UDTSOCKET regist_sock;

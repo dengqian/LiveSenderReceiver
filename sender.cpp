@@ -9,9 +9,13 @@
    #include <wspiapi.h>
 #endif
 #include <iostream>
+#include<fstream>
 //#include <udt.h>
 #include "cc.h"
 #include "test_util.h"
+
+#include "kodo/encode.h"
+#include "kodo/decode.h"
 
 using namespace std;
 
@@ -92,52 +96,86 @@ int main(int argc, char* argv[])
    }
 
    UDTSOCKET client1, client2;
-   createUDTSocket(client1, cloud_server1, cloud_server_port);
-   createUDTSocket(client2, cloud_server2, cloud_server_port);
+   createUDTSocket(client1, cloud_server1, "9000");
+   createUDTSocket(client2, cloud_server2, "9001");
 
    connect(client1, cloud_server1, cloud_server_port);
    connect(client2, cloud_server2, cloud_server_port);
 
    #ifndef WIN32
-      pthread_create(new pthread_t, NULL, monitor, &client1);
+      pthread_create(new pthread_t, NULL, monitor, &client2);
    #else
-      CreateThread(NULL, 0, monitor, &client, 0, NULL);
+      CreateThread(NULL, 0, monitor, &client2, 0, NULL);
    #endif
+
+    
+    fstream in(argv[3], ios::in | ios::binary);
+    
+    const int size = 10240;
+    char* buffer = new char[size];
+    int seg_num = 0;
+    while(!in.eof()){
+        // in.get(buffer);
+        in.read(buffer, size); 
+
+        vector<uint8_t> data_out;
+        encode((uint8_t*) buffer, data_out, size, seg_num++);
+        const char* data = (const char*)data_out.data();
+        cout<<"data encoded!"<<endl;
+        // cout<<data<<endl;
+        int ssize = 0;
+        int ss;
+        while (ssize < size)
+        {
+           if (UDT::ERROR == (ss = UDT::send(client1, data + ssize, size - ssize, 0)))
+           {
+              cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
+              return 0;
+           }
+           ssize += ss;
+        }
+
+        if (ssize < size)
+           break;
+        // cout<<"data sent"<<endl;
+    }
    
-   char* data;
-   int size = 10240;
-   data = new char[size];
+    in.close();
 
-   for (int i = 0; i < 1000000; i ++)
-   {
-      int ssize = 0;
-      int ss;
-      while (ssize < size)
-      {
-         if (UDT::ERROR == (ss = UDT::send(client1, data + ssize, size - ssize, 0)))
-         {
-            cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
-            break;
-         }
+   // char* data;
+   // int size = 10240;
+   // data = new char[size];
 
-         ssize += ss;
-        
-         if (UDT::ERROR == (ss = UDT::send(client2, data + ssize, size - ssize, 0)))
-         {
-            cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
-            break;
-         }
+   // for (int i = 0; ; i ++)
+   // {
+   //    int ssize = 0;
+   //    int ss;
+   //    while (ssize < size)
+   //    {
+   //       if (UDT::ERROR == (ss = UDT::send(client1, data + ssize, size - ssize, 0)))
+   //       {
+   //          cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
+   //          break;
+   //       }
 
-         ssize += ss;
-      }
+   //       ssize += ss;
+   //      
+   //       if (UDT::ERROR == (ss = UDT::send(client2, data + ssize, size - ssize, 0)))
+   //       {
+   //          cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
+   //          break;
+   //       }
 
-      if (ssize < size)
-         break;
-   }
+   //       ssize += ss;
+   //    }
+
+   //    if (ssize < size)
+   //       break;
+   // }
 
    UDT::close(client1);
    UDT::close(client2);
-   delete [] data;
+   // delete [] data;
    return 0;
 }
 
