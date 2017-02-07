@@ -99,11 +99,11 @@ int main(int argc, char* argv[])
    connect(client1, cloud_server1, cloud_server_port);
    connect(client2, cloud_server2, cloud_server_port);
    
-   #ifndef WIN32
-      pthread_create(new pthread_t, NULL, monitor, &client2);
-   #else
-      CreateThread(NULL, 0, monitor, &client2, 0, NULL);
-   #endif
+   // #ifndef WIN32
+   //    pthread_create(new pthread_t, NULL, monitor, &client2);
+   // #else
+   //    CreateThread(NULL, 0, monitor, &client2, 0, NULL);
+   // #endif
 
    #ifndef WIN32
       pthread_t rcvthread1, rcvthread2;
@@ -205,7 +205,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
       // const char* data_decoded = (const char*)decode_data.data();
       // cout<<data_decoded<<endl;
 	
-      cout<<data<<endl;
+      cout<<"recvd data:"<<data<<endl;
       if (rsize < size)
          break;
    }

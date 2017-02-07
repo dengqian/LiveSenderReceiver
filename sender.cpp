@@ -89,7 +89,7 @@ DWORD WINAPI monitor(LPVOID);
 
 int main(int argc, char* argv[])
 {
-   if (1 != argc)
+   if (2 != argc)
    {
       cout << "usage: appclient filename" << endl;
       return 0;
@@ -102,18 +102,18 @@ int main(int argc, char* argv[])
    connect(client1, cloud_server1, cloud_server_port);
    connect(client2, cloud_server2, cloud_server_port);
 
-   #ifndef WIN32
-      pthread_create(new pthread_t, NULL, monitor, &client2);
-   #else
-      CreateThread(NULL, 0, monitor, &client2, 0, NULL);
-   #endif
+   // #ifndef WIN32
+   //    pthread_create(new pthread_t, NULL, monitor, &client2);
+   // #else
+   //    CreateThread(NULL, 0, monitor, &client2, 0, NULL);
+   // #endif
 
     
-    fstream in(argv[3], ios::in | ios::binary);
+    fstream in(argv[1], ios::in | ios::binary);
     
-    const int size = 10240;
+    const int size = 10240*3;
     char* buffer = new char[size];
-    int seg_num = 0;
+    uint8_t seg_num = 0;
     while(!in.eof()){
         // in.get(buffer);
         in.read(buffer, size); 
@@ -133,11 +133,17 @@ int main(int argc, char* argv[])
               return 0;
            }
            ssize += ss;
+           if (UDT::ERROR == (ss = UDT::send(client2, data + ssize, size - ssize, 0)))
+           {
+              cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
+              return 0;
+           }
+           ssize += ss;
         }
 
         if (ssize < size)
            break;
-        // cout<<"data sent"<<endl;
+        cout<<"data sent"<<endl;
     }
    
     in.close();
