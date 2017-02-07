@@ -10,9 +10,11 @@
 #endif
 
 #include <iostream>
-//#include <udt.h>
+
+#include "common.h"
 #include "cc.h"
 #include "test_util.h"
+#include "kodo/decode.h"
 
 using namespace std;
 
@@ -22,6 +24,7 @@ const char* cloud_server_port = "9000";
 const int g_serverNum = 2;  // num of cloud server
 
 void* recvdata(void*);
+void* monitor(void*);
 
 
 int createUDTSocket(UDTSOCKET& usock, const char* server_ip, const char* server_port)
@@ -79,11 +82,6 @@ int connect(UDTSOCKET& usock, const char *server_ip, const char* port)
    return 0;
 }
 
-#ifndef WIN32
-void* monitor(void*);
-#else
-DWORD WINAPI monitor(LPVOID);
-#endif
 
 int main(int argc, char* argv[])
 {
@@ -177,9 +175,8 @@ DWORD WINAPI recvdata(LPVOID usocket)
    UDTSOCKET recver = *(UDTSOCKET*)usocket;
    delete (UDTSOCKET*)usocket;
 
-   char* data;
-   int size = 10240;
-   data = new char[size];
+   int size = SEGMENT_SIZE;
+   char* data = new char[size];
    int total = 0;
 
    while (true)
@@ -203,9 +200,13 @@ DWORD WINAPI recvdata(LPVOID usocket)
 
          rsize += rs;
       }
-      // const char* data_decoded = decode((uint8_t*)data, size);
+
+      // vector<uint8_t> decode_data;
+      // decode((uint8_t*)data, decode_data, size); 
+      // const char* data_decoded = (const char*)decode_data.data();
       // cout<<data_decoded<<endl;
 	
+      cout<<data<<endl;
       if (rsize < size)
          break;
    }

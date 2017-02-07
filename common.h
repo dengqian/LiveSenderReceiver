@@ -1,10 +1,13 @@
-#ifndef _PUSH_COMMON_H_
-#define _PUSH_COMMON_H_
+#ifndef _COMMON_H_
+#define _COMMON_H_
 
-#define MAX_CLIENT 1000
-#define RECV_BUFF_SIZE 1024*1024*10
+#include <cstdint>
+#include <cstdlib>
 
-const char* clientPort="9000"
-const char* registPort="8080"
+// #define BLOCK_SIZE 1024
 
-const int ITEMSIZE = 10240
+const int SEGMENT_SIZE = 10240;
+const uint32_t BLOCK_SIZE = 1024;
+
+
+#endif

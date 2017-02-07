@@ -1,4 +1,7 @@
 C++ = g++
+DEPDIR := .d
+$(shell mkdir -p $(DEPDIR) >/dev/null)
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 
 ifndef os
    os = LINUX
@@ -39,19 +42,16 @@ endif
 
 DIR = $(shell pwd)
 
-#APP = appserver appclient sendfile recvfile test push_server sender receiver 
-APP = sender 
+APP = appserver appclient sendfile recvfile test push_server sender receiver 
+# APP = sender 
 
 all: $(APP)
 
 KODOFLAGS =  -Wl,-Bdynamic -lkodoc -Wl,-rpath .
 
-%.o: %.cpp
-	$(C++) $(CCFLAGS) $< -c
+%.o : %.cpp #$(DEPDIR)/%.d
+	$(C++) $(CCFLAGS) $(DEPFLAGS) $< -c
 
-
-# serder.cpp: kodo/encoder.h
-# receiver.cpp: kodo/decoder.h
 
 appserver: appserver.o
 	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
