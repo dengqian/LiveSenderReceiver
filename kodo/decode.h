@@ -12,7 +12,6 @@
 #include <kodocpp/kodocpp.hpp>
 
 // Count the total number of packets received in order to decode
-unsigned int rx_packets;
 
 
 int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, uint32_t length) 
@@ -53,12 +52,10 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, uint32_t length)
         // Receive message
         // remote_address_size = sizeof(remote_address);
         memcpy(payload.data(), data_in+offset, payload_size); 
-<<<<<<< HEAD
-        offset += payload_size;
-=======
+
+        // offset += payload_size;
         // std::cout<<payload.data()<<std::endl;
         offset = offset+payload_size+1;
->>>>>>> c3c6379b1fe1f0903cb2cbc9dd05ba46e83b0edd
 
         // bytes_received = recvfrom(
         //     socket_descriptor, (char*)payload.data(), payload_size, 0,
@@ -76,7 +73,6 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, uint32_t length)
         //        inet_ntoa(remote_address.sin_addr),
         //        ntohs(remote_address.sin_port), bytes_received);
 
-        // ++rx_packets;
 
         // Packet got through - pass that packet to the decoder
         decoder.read_payload(payload.data());
@@ -99,13 +95,8 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, uint32_t length)
         payload.clear();
     }
 
-<<<<<<< HEAD
-    printf("Data decoded!\n");
-    std::cout<<data_out.data()<<'\n';
-=======
     printf("Data decoded!");
     std::cout<<data_out.size()<<' '<<data_out.data()<<'\n';
->>>>>>> c3c6379b1fe1f0903cb2cbc9dd05ba46e83b0edd
 
     return 0; 
 
