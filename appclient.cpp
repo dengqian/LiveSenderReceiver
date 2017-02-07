@@ -9,7 +9,7 @@
    #include <wspiapi.h>
 #endif
 #include <iostream>
-//#include <udt.h>
+
 #include "cc.h"
 #include "test_util.h"
 

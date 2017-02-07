@@ -10,7 +10,6 @@
 
 
 #include <kodocpp/kodocpp.hpp>
-#include "common.h"
 
 // Count the total number of packets received in order to decode
 
@@ -19,7 +18,7 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, uint32_t length)
 {
 
 
-    uint32_t symbol_size = BLOCK_SIZE;
+    uint32_t symbol_size = 1024;
     uint32_t symbols = length / symbol_size ;
     std::cout<<symbols<<std::endl;
 

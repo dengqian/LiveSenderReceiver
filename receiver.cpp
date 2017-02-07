@@ -11,7 +11,6 @@
 
 #include <iostream>
 
-#include "common.h"
 #include "cc.h"
 #include "test_util.h"
 #include "kodo/decode.h"
@@ -175,7 +174,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
    UDTSOCKET recver = *(UDTSOCKET*)usocket;
    delete (UDTSOCKET*)usocket;
 
-   int size = SEGMENT_SIZE;
+   int size = 10240;
    char* data = new char[size];
    int total = 0;
 

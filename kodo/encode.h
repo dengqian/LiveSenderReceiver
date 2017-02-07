@@ -13,6 +13,7 @@
 #include <kodocpp/kodocpp.hpp>
 #include <iostream>
 
+
 int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, int segment_number)
 {
     uint32_t symbol_size = 1024; // encode block size
