@@ -31,8 +31,6 @@ public:
     ~item(){}
 };
 
-// #include "common.h"
-// test
 
 UDTSOCKET receiver_sock;
 vector<UDTSOCKET> regist_sock_list;
