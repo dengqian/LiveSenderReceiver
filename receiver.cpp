@@ -12,8 +12,9 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "cc.h"
-#include "test_util.h"
+// #include "cc.h"
+// #include "test_util.h"
+
 #include "kodo/decode.h"
 
 #include "common.h"
@@ -22,69 +23,13 @@ using namespace std;
 
 const char* cloud_server1 = "139.199.94.164";
 const char* cloud_server2 = "139.199.165.244";
-const char* cloud_server_port = "9000";
-const int g_serverNum = 2;  // num of cloud server
+const char* cloud_server_port = SERVER_TO_RECEIVER_PORT;
 
 void* recvdata(void*);
 void* monitor(void*);
 
-unordered_map<uint8_t, vector<char*>> recv_data_buffer; 
 
-
-int createUDTSocket(UDTSOCKET& usock, const char* server_ip, const char* server_port)
-{
-   struct addrinfo hints, *local;
-
-   memset(&hints, 0, sizeof(struct addrinfo));
-
-   hints.ai_flags = AI_PASSIVE;
-   hints.ai_family = AF_INET;
-   hints.ai_socktype = SOCK_STREAM;
-   //hints.ai_socktype = SOCK_DGRAM;
-
-   if (0 != getaddrinfo(NULL, "9000", &hints, &local))
-   {
-      cout << "incorrect network address.\n" << endl;
-      return 0;
-   }
-
-   usock = UDT::socket(local->ai_family, local->ai_socktype, local->ai_protocol);
-
-   #ifdef WIN32
-      UDT::setsockopt(usock, 0, UDT_MSS, new int(1052), sizeof(int));
-   #endif
-      
-   freeaddrinfo(local);
-   
-   return 0;
-}
-
-int connect(UDTSOCKET& usock, const char *server_ip, const char* port)
-{
-   addrinfo hints, *peer;
-   memset(&hints, 0, sizeof(struct addrinfo));
-
-   hints.ai_flags = AI_PASSIVE;
-   hints.ai_family = AF_INET;
-   hints.ai_socktype = SOCK_STREAM;
-
-   if (0 != getaddrinfo(server_ip, port, &hints, &peer))
-   {
-      cout << "incorrect server/peer address. " << server_ip << ":" << port << endl;
-      return 0;
-   }
-
-   // connect to the server, implict bind
-   if (UDT::ERROR == UDT::connect(usock, peer->ai_addr, peer->ai_addrlen))
-   {
-      cout << "connect: " << UDT::getlasterror().getErrorMessage() << endl;
-      return 0;
-   }
-
-   freeaddrinfo(peer);
-   
-   return 0;
-}
+unordered_map<uint8_t, vector<char*>> buffer; 
 
 
 int main(int argc, char* argv[])
@@ -98,8 +43,8 @@ int main(int argc, char* argv[])
    UDTUpDown _udt_;
 
    UDTSOCKET client1, client2;
-   createUDTSocket(client1, cloud_server1, cloud_server_port);
-   createUDTSocket(client2, cloud_server2, cloud_server_port);
+   createUDTSocket(client1, "9000");
+   createUDTSocket(client2, "9001");
 
    connect(client1, cloud_server1, cloud_server_port);
    connect(client2, cloud_server2, cloud_server_port);
@@ -112,9 +57,14 @@ int main(int argc, char* argv[])
 
    #ifndef WIN32
       pthread_t rcvthread1, rcvthread2;
+
+      cout << "creating thread1, recv from socket:" << client1 << endl;
       pthread_create(&rcvthread1, NULL, recvdata, new UDTSOCKET(client1));
-      pthread_join(rcvthread1, NULL);
+
+      cout << "creating thread1, recv from socket:" << client1 << endl;
       pthread_create(&rcvthread2, NULL, recvdata, new UDTSOCKET(client2));
+
+      pthread_join(rcvthread1, NULL); 
       pthread_join(rcvthread2, NULL);
    #else
       CreateThread(NULL, 0, recvdata, new UDTSOCKET(recver), 0, NULL);
@@ -189,7 +139,6 @@ DWORD WINAPI recvdata(LPVOID usocket)
 
       // int rcv_size;
       // int var_size = sizeof(int);
-
       // UDT::getsockopt(recver, 0, UDT_RCVDATA, &rcv_size, &var_size);
 
       int rsize = 0;
@@ -213,8 +162,8 @@ DWORD WINAPI recvdata(LPVOID usocket)
       char* start = 0;
       cout<<"data: "<<data<<endl;
       if((start = strstr(data, "seg:")) != NULL){
-          seg_num = (*start); 
-          cout<< "seg_num:" << seg_num<<endl;
+          seg_num = *(start+4); 
+          cout<< "form socket:" << recver << ", seg_num:" << int(seg_num)<<endl;
       }
 
 
