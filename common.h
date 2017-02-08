@@ -8,7 +8,7 @@
 #define ENCODED_BLOCK_SIZE 1048
 
 const char* SENDER_TO_SERVER_PORT = "9090";
-const char* SERVER_TO_RECEIVER_PORT = "9000";
+const char* SERVER_TO_RECEIVER_PORT = "9001";
 
 #endif
 

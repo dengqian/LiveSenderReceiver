@@ -14,6 +14,7 @@
 #include <udt.h>
 
 #include "wqueue.h"
+#include "common.h"
 
 #include "cc.h"
 #include "test_util.h"
@@ -281,8 +282,8 @@ void* pushdata(void* usocket)
 
 int main(int argc, char* argv[]){
 
-    const char* upload_port = "9090";
-    const char* client_port = "9000";
+    const char* upload_port = SENDER_TO_SERVER_PORT;
+    const char* client_port = SERVER_TO_RECEIVER_PORT;
 
     UDTSOCKET listen_to_uploader;
     UDTSOCKET listen_to_regist;
