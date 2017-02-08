@@ -110,30 +110,41 @@ int main(int argc, char* argv[])
 
     
     fstream in(argv[1], ios::in | ios::binary);
-    
-    const int size = 10240*3;
+
+#define SEGMENT_SIZE 10240   
+#define BLOCK_SIZE 1024
+#define ENCODED_BLOCK_SIZE 1048
+
+    const int size = SEGMENT_SIZE;
     char* buffer = new char[size];
     uint8_t seg_num = 0;
+
     while(!in.eof()){
-        // in.get(buffer);
+
         in.read(buffer, size); 
 
         vector<uint8_t> data_out;
         encode((uint8_t*) buffer, data_out, size, seg_num++);
         const char* data = (const char*)data_out.data();
-        cout<<"data encoded!"<<endl;
-        // cout<<data<<endl;
+        cout<<data_out.size()<<" bytes data encoded!"<<endl;
+
+        int send_size = data_out.size();
         int ssize = 0;
         int ss;
-        while (ssize < size)
+        while (ssize < send_size)
         {
-           if (UDT::ERROR == (ss = UDT::send(client1, data + ssize, size - ssize, 0)))
+           if (UDT::ERROR == (ss = UDT::send(client1, data + ssize, ENCODED_BLOCK_SIZE, 0)))
            {
               cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
               return 0;
            }
+
            ssize += ss;
-           if (UDT::ERROR == (ss = UDT::send(client2, data + ssize, size - ssize, 0)))
+
+           if(ssize >= send_size) 
+               break;
+
+           if (UDT::ERROR == (ss = UDT::send(client2, data + ssize, ENCODED_BLOCK_SIZE, 0)))
            {
               cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
               return 0;
@@ -141,7 +152,7 @@ int main(int argc, char* argv[])
            ssize += ss;
         }
 
-        if (ssize < size)
+        if (ssize < send_size)
            break;
         cout<<"data sent"<<endl;
     }
@@ -181,6 +192,7 @@ int main(int argc, char* argv[])
 
    UDT::close(client1);
    UDT::close(client2);
+
    // delete [] data;
    return 0;
 }

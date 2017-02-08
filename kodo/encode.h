@@ -53,10 +53,13 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint8_t segm
         uint32_t bytes_used = encoder.write_payload(payload.data());
         
 
+        int len = data_out.size();
+
         data_out.insert(data_out.end(), tag_t, tag_t+4);
         data_out.push_back(segment_number);
         data_out.insert(data_out.end(), payload.begin(), payload.end());
-        std::cout<<int(segment_number)<<std::endl;
+
+        std::cout<<int(segment_number)<<' '<<data_out.size()-len<<std::endl;
         // return_code = sendto(socket_descriptor, (const char*)payload.data(),
         //                      bytes_used, 0, (struct sockaddr*) &remote_address,
         //                      sizeof(remote_address));

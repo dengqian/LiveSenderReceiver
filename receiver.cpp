@@ -10,10 +10,13 @@
 #endif
 
 #include <iostream>
+#include <unordered_map>
 
 #include "cc.h"
 #include "test_util.h"
 #include "kodo/decode.h"
+
+#include "common.h"
 
 using namespace std;
 
@@ -24,6 +27,8 @@ const int g_serverNum = 2;  // num of cloud server
 
 void* recvdata(void*);
 void* monitor(void*);
+
+unordered_map<uint8_t, vector<char*>> recv_data_buffer; 
 
 
 int createUDTSocket(UDTSOCKET& usock, const char* server_ip, const char* server_port)
@@ -174,44 +179,55 @@ DWORD WINAPI recvdata(LPVOID usocket)
    UDTSOCKET recver = *(UDTSOCKET*)usocket;
    delete (UDTSOCKET*)usocket;
 
-   int size = 10240;
-   char* data = new char[size];
+   int size = ENCODED_BLOCK_SIZE;
    int total = 0;
 
    while (true)
    {
-      int rsize = 0;
       int rs;
-      while (rsize < size)
-      {
-         int rcv_size;
-         int var_size = sizeof(int);
-         UDT::getsockopt(recver, 0, UDT_RCVDATA, &rcv_size, &var_size);
+      char* data = new char[size];
 
-         if (UDT::ERROR == (rs = UDT::recv(recver, data + rsize, size - rsize, 0)))
+      // int rcv_size;
+      // int var_size = sizeof(int);
+
+      // UDT::getsockopt(recver, 0, UDT_RCVDATA, &rcv_size, &var_size);
+
+      int rsize = 0;
+      
+      while(rsize < size){
+
+         if (UDT::ERROR == (rs = UDT::recv(recver, data+rsize, size-rsize, 0)))
          {
             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
             break;
          }
 
-         total += rs;
-         // cout<< total <<"bytes data rcvd"<<endl;
-
          rsize += rs;
+
+         total += rs;
+         cout<< rs <<" bytes data rcvd"<<endl;
       }
+
+
+      uint8_t seg_num;
+      char* start = 0;
+      cout<<"data: "<<data<<endl;
+      if((start = strstr(data, "seg:")) != NULL){
+          seg_num = (*start); 
+          cout<< "seg_num:" << seg_num<<endl;
+      }
+
 
       // vector<uint8_t> decode_data;
       // decode((uint8_t*)data, decode_data, size); 
       // const char* data_decoded = (const char*)decode_data.data();
       // cout<<data_decoded<<endl;
 	
-      cout<<"recvd data:"<<data<<endl;
-      if (rsize < size)
-         break;
+      // cout<<"recvd data:"<<rs<<" bytes. "<<data<<endl;
    }
 
 
-   delete [] data;
+   // delete [] data;
 
    UDT::close(recver);
 
