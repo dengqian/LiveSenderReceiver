@@ -12,10 +12,10 @@
 #include "test_util.h"
 
 
-#define SEGMENT_SIZE 10240   
-#define BLOCK_SIZE 1024
-#define BLOCK_NUM SEGMENT_SIZE / BLOCK_SIZE 
-#define ENCODED_BLOCK_SIZE 1048
+#define SEGMENT_SIZE 102400*4   
+#define BLOCK_SIZE 1024*4
+#define BLOCK_NUM SEGMENT_SIZE / BLOCK_SIZE
+#define ENCODED_BLOCK_SIZE BLOCK_SIZE+BLOCK_NUM+14
 
 using namespace std;
 
@@ -78,6 +78,48 @@ int connect(UDTSOCKET& usock, const char *server_ip, const char* port)
    freeaddrinfo(peer);
    
    return 1;
+}
+
+#ifndef WIN32
+void* monitor(void* s)
+#else
+DWORD WINAPI monitor(LPVOID s)
+#endif
+{
+   UDTSOCKET u = *(UDTSOCKET*)s;
+
+   UDT::TRACEINFO perf;
+
+   cout << "SendRate(Mb/s)\tRTT(ms)\tFlowWnd\tCWnd\tPktSndPeriod(us)\tRecvACK\tRecvNAK" << endl;
+
+   while (true)
+   {
+      #ifndef WIN32
+         sleep(1);
+      #else
+         Sleep(1000);
+      #endif
+
+      if (UDT::ERROR == UDT::perfmon(u, &perf))
+      {
+         cout << "perfmon: " << UDT::getlasterror().getErrorMessage() << endl;
+         break;
+      }
+
+      cout << perf.mbpsSendRate << "\t\t" 
+           << perf.msRTT << "\t" 
+           << perf.pktFlowWindow << "\t" 
+           << perf.pktCongestionWindow << "\t" 
+           << perf.usPktSndPeriod << "\t\t\t" 
+           << perf.pktRecvACK << "\t" 
+           << perf.pktRecvNAK << endl;
+   }
+
+   #ifndef WIN32
+      return NULL;
+   #else
+      return 0;
+   #endif
 }
 
 #endif

@@ -13,10 +13,11 @@
 #include <kodocpp/kodocpp.hpp>
 #include <iostream>
 
+const int block_size = 1024*4;
 
 int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint8_t segment_number)
 {
-    uint32_t symbol_size = 1024; // encode block size
+    uint32_t symbol_size = block_size; // encode block size
     uint32_t symbols = size / symbol_size ; // number of blocks to be encoded.
 
     if(symbols == 0) symbols = 1; // number of blocks can't be 0.
