@@ -15,7 +15,6 @@
 // #include "test_util.h"
 
 #include "kodo/encode.h"
-#include "kodo/decode.h"
 
 #include "common.h"
 
