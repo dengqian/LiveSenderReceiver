@@ -35,7 +35,8 @@ vector<UDTSOCKET> regist_sock_list;
 UDTSOCKET regist_sock;
 wqueue<item*> queue;
 
-int buff_size = 10240;
+int buff_size = ENCODED_BLOCK_SIZE * BLOCK_NUM;
+const int buffer_block_size = 10;
 
 
 void* recvdata(void *);
@@ -159,7 +160,6 @@ DWORD WINAPI recvdata(LPVOID usocket)
    UDTSOCKET client = *(UDTSOCKET*)usocket;
    delete (UDTSOCKET*)usocket;
 
-   
 
    while (true)
    {
@@ -169,9 +169,10 @@ DWORD WINAPI recvdata(LPVOID usocket)
 
       while (rsize < buff_size)
       {
-         int rcv_size;
-         int var_size = sizeof(int);
-         UDT::getsockopt(receiver_sock, 0, UDT_RCVDATA, &rcv_size, &var_size);
+         // int rcv_size;
+         // int var_size = sizeof(int);
+         // UDT::getsockopt(receiver_sock, 0, UDT_RCVDATA, &rcv_size, &var_size);
+
          if (UDT::ERROR == (rs = UDT::recv(client, data + rsize, buff_size - rsize, 0)))
          {
             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
@@ -200,11 +201,11 @@ DWORD WINAPI recvdata(LPVOID usocket)
          // }
 
          // add to shared buffer.
-         queue.add(new item(data, rsize, rsize+rs));
         
          rsize += rs;
       }
-
+      
+      queue.add(new item(data, 0, rsize)); 
 
       if (rsize < buff_size)
          break;
@@ -227,9 +228,9 @@ void* pushdata(void* usocket)
    int size = 0;
    int s=queue.size();
 
-   int buffer_block_size = 300;
    char* data_addr = queue.front()->data;
 
+   // init buffer block size can't exceed buffer_block_size.
    if(s > buffer_block_size)
    {
        // cout<<"initial size:"<<s<<endl;
@@ -248,12 +249,12 @@ void* pushdata(void* usocket)
 
        item* it = queue.pop_front();
 
+       // pointer changed, delete data from queue.
        if(it->data != data_addr){
            cout<< "queue size:" << queue.size() << " " <<size<<" bytes data pushed" <<endl;
            char* data_pushed = data_addr;
            delete [] data_pushed;
            data_addr = it->data;
-
        }
 
        int snd_size = 0;
