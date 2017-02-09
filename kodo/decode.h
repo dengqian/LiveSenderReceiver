@@ -14,12 +14,12 @@
 // Count the total number of packets received in order to decode
 
 
-int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, uint32_t length) 
+int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num) 
 {
 
 
     uint32_t symbol_size = 1024;
-    uint32_t symbols = length / symbol_size ;
+    uint32_t symbols = num;
     std::cout<<symbols<<std::endl;
 
     // Initialize the factory with the chosen symbols and symbol size
@@ -86,17 +86,17 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, uint32_t length)
                 {
                     // Update that this symbol has been decoded,
                     // in a real application we could process that symbol
-                    printf("Symbol %d was decoded\n", i);
+                    // printf("Symbol %d was decoded\n", i);
                     decoded[i] = true;
                 }
             }
         }
-        std::cout<<payload.data()<<std::endl;
+        // std::cout<<payload.data()<<std::endl;
         payload.clear();
     }
 
     printf("Data decoded!");
-    std::cout<<data_out.size()<<' '<<data_out.data()<<'\n';
+    // std::cout<<data_out.size()<<' '<<data_out.data()<<'\n';
 
     return 0; 
 

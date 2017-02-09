@@ -10,7 +10,7 @@
 #endif
 
 #include <iostream>
-#include <unordered_map>
+#include <map>
 
 // #include "cc.h"
 // #include "test_util.h"
@@ -28,8 +28,57 @@ const char* cloud_server_port = SERVER_TO_RECEIVER_PORT;
 void* recvdata(void*);
 void* monitor(void*);
 
+// received data will be put into a map, with key seg_num, value block data char*.
+// when the number of data blocks is enough for decode, do decoding.
+class recv_data{
+public:
+    vector<char*> data;
+    const char* decoded_data;
+    int length;
 
-unordered_map<uint8_t, vector<char*>> buffer; 
+public:
+    recv_data() {
+        decoded_data = 0;
+    }
+
+    ~recv_data(){
+        for(auto it : data){
+            delete [] it;
+        }
+        delete [] decoded_data;
+    }
+
+    void push_back(char* item){
+        data.push_back(item);
+    }
+
+    int size(){
+        return data.size();
+    }
+
+    void decoding(){
+        if (data.size() < SEGMENT_SIZE / BLOCK_SIZE) return;
+
+        length = data.size() * ENCODED_BLOCK_SIZE;
+        
+        char* data_in = new char[length];
+        strcpy(data_in, data[0]);
+        for(int i=1; i<data.size(); i++){
+            strcat(data_in, data[i]); 
+        }
+
+        vector<uint8_t> data_out;
+        decode((uint8_t*)data_in, data_out, length); 
+        decoded_data = (const char*)data_out.data();
+
+        data.clear();
+        delete [] data_in;
+    }
+
+};
+
+
+map<uint8_t, recv_data>buffer; 
 
 
 int main(int argc, char* argv[])
@@ -61,7 +110,7 @@ int main(int argc, char* argv[])
       cout << "creating thread1, recv from socket:" << client1 << endl;
       pthread_create(&rcvthread1, NULL, recvdata, new UDTSOCKET(client1));
 
-      cout << "creating thread1, recv from socket:" << client1 << endl;
+      cout << "creating thread2, recv from socket:" << client2 << endl;
       pthread_create(&rcvthread2, NULL, recvdata, new UDTSOCKET(client2));
 
       pthread_join(rcvthread1, NULL); 
@@ -163,6 +212,12 @@ DWORD WINAPI recvdata(LPVOID usocket)
       cout<<"data: "<<data<<endl;
       if((start = strstr(data, "seg:")) != NULL){
           seg_num = *(start+4); 
+          buffer[seg_num].push_back(start+5);
+          if(buffer[seg_num].size() == SEGMENT_SIZE / BLOCK_SIZE) {
+              buffer[seg_num].decoding();
+              cout << "seg " << int(seg_num) << ":" << buffer[seg_num].length \
+                  <<" blocks,"<<buffer[seg_num].decoded_data << endl;
+          }
           cout<< "form socket:" << recver << ", seg_num:" << int(seg_num)<<endl;
       }
 
