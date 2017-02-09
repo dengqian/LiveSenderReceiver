@@ -12,10 +12,10 @@
 #include "test_util.h"
 
 
-#define SEGMENT_SIZE 102400   
-#define BLOCK_SIZE 1024
-#define BLOCK_NUM SEGMENT_SIZE / BLOCK_SIZE 
-#define ENCODED_BLOCK_SIZE 1048
+#define SEGMENT_SIZE 102400*4   
+#define BLOCK_SIZE 1024*4
+#define BLOCK_NUM SEGMENT_SIZE / BLOCK_SIZE
+#define ENCODED_BLOCK_SIZE BLOCK_SIZE+BLOCK_NUM+14
 
 using namespace std;
 

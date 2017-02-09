@@ -49,9 +49,11 @@ all: $(APP)
 
 KODOFLAGS =  -Wl,-Bdynamic -lkodoc -Wl,-rpath .
 
-%.o : %.cpp #$(DEPDIR)/%.d
-	$(C++) $(CCFLAGS) $(DEPFLAGS) $< -c
+# %.o : %.cpp $(DEPDIR)/%.d
+# 	$(C++) $(CCFLAGS) $(DEPFLAGS) $< -c
 
+%.o : %.cpp common.h 
+	$(C++) $(CCFLAGS) $< -c
 
 appserver: appserver.o
 	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
