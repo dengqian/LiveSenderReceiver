@@ -14,6 +14,7 @@
 
 #define SEGMENT_SIZE 10240   
 #define BLOCK_SIZE 1024
+#define BLOCK_NUM SEGMENT_SIZE / BLOCK_SIZE 
 #define ENCODED_BLOCK_SIZE 1048
 
 using namespace std;
