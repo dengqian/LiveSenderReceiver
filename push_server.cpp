@@ -16,8 +16,6 @@
 #include "wqueue.h"
 #include "common.h"
 
-#include "cc.h"
-#include "test_util.h"
 
 using namespace std;
 

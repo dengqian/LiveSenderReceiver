@@ -10,7 +10,7 @@
 #endif
 #include <iostream>
 #include<fstream>
-// #include <udt.h>
+
 // #include "cc.h"
 // #include "test_util.h"
 
@@ -26,11 +26,7 @@ const char* cloud_server2 = "139.199.165.244";
 const char* cloud_server_port = SENDER_TO_SERVER_PORT;
 
 
-#ifndef WIN32
-void* monitor(void*);
-#else
-DWORD WINAPI monitor(LPVOID);
-#endif
+// void* monitor(void*);
 
 int main(int argc, char* argv[])
 {
@@ -74,7 +70,7 @@ int main(int argc, char* argv[])
         int ss;
         while (ssize < send_size)
         {
-           if (UDT::ERROR == (ss = UDT::send(client1, data + ssize, ENCODED_BLOCK_SIZE, 0)))
+           if (UDT::ERROR == (ss = UDT::send(client1, data + ssize, ENCODED_BLOCK_SIZE*2, 0)))
            {
               cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
               return 0;
@@ -138,44 +134,3 @@ int main(int argc, char* argv[])
    return 0;
 }
 
-#ifndef WIN32
-void* monitor(void* s)
-#else
-DWORD WINAPI monitor(LPVOID s)
-#endif
-{
-   UDTSOCKET u = *(UDTSOCKET*)s;
-
-   UDT::TRACEINFO perf;
-
-   cout << "SendRate(Mb/s)\tRTT(ms)\tFlowWnd\tCWnd\tPktSndPeriod(us)\tRecvACK\tRecvNAK" << endl;
-
-   while (true)
-   {
-      #ifndef WIN32
-         sleep(1);
-      #else
-         Sleep(1000);
-      #endif
-
-      if (UDT::ERROR == UDT::perfmon(u, &perf))
-      {
-         cout << "perfmon: " << UDT::getlasterror().getErrorMessage() << endl;
-         break;
-      }
-
-      cout << perf.mbpsSendRate << "\t\t" 
-           << perf.msRTT << "\t" 
-           << perf.pktFlowWindow << "\t" 
-           << perf.pktCongestionWindow << "\t" 
-           << perf.usPktSndPeriod << "\t\t\t" 
-           << perf.pktRecvACK << "\t" 
-           << perf.pktRecvNAK << endl;
-   }
-
-   #ifndef WIN32
-      return NULL;
-   #else
-      return 0;
-   #endif
-}

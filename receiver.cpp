@@ -12,9 +12,6 @@
 #include <iostream>
 #include <map>
 
-// #include "cc.h"
-// #include "test_util.h"
-
 #include "kodo/decode.h"
 
 #include "common.h"
@@ -26,7 +23,7 @@ const char* cloud_server2 = "139.199.165.244";
 const char* cloud_server_port = SERVER_TO_RECEIVER_PORT;
 
 void* recvdata(void*);
-void* monitor(void*);
+// void* monitor(void*);
 
 // received data will be put into a map, with key seg_num, value block data char*.
 // when the number of data blocks is enough for decode, do decoding.
@@ -34,7 +31,7 @@ class recv_data{
 public:
     vector<char*> data;
     const char* decoded_data;
-    int length;
+    int data_size;
 
 public:
     recv_data() {
@@ -57,18 +54,22 @@ public:
     }
 
     void decoding(){
-        if (data.size() < SEGMENT_SIZE / BLOCK_SIZE) return;
 
-        length = data.size() * ENCODED_BLOCK_SIZE;
+        data_size = data.size();
+
+        if (data_size < SEGMENT_SIZE / BLOCK_SIZE) return;
+
+        int length = data_size * ENCODED_BLOCK_SIZE;
         
         char* data_in = new char[length];
         strcpy(data_in, data[0]);
-        for(int i=1; i<data.size(); i++){
+
+        for(int i=1; i<data_size; i++){
             strcat(data_in, data[i]); 
         }
 
         vector<uint8_t> data_out;
-        decode((uint8_t*)data_in, data_out, length); 
+        decode((uint8_t*)data_in, data_out, data_size); 
         decoded_data = (const char*)data_out.data();
 
         data.clear();
@@ -126,48 +127,6 @@ int main(int argc, char* argv[])
    return 0;
 }
 
-#ifndef WIN32
-void* monitor(void* s)
-#else
-DWORD WINAPI monitor(LPVOID s)
-#endif
-{
-   UDTSOCKET u = *(UDTSOCKET*)s;
-
-   UDT::TRACEINFO perf;
-
-   cout << "RecvRate(Mb/s)\tRTT(ms)\tFlowWnd\tCWnd\tPktSndPeriod(us)\tRecvACK\tRecvNAK" << endl;
-
-   while (true)
-   {
-      #ifndef WIN32
-         sleep(1);
-      #else
-         Sleep(1000);
-      #endif
-
-      if (UDT::ERROR == UDT::perfmon(u, &perf))
-      {
-         cout << "perfmon: " << UDT::getlasterror().getErrorMessage() << endl;
-         break;
-      }
-
-      cout << perf.mbpsRecvRate << "\t\t" 
-           << perf.msRTT << "\t" 
-           << perf.pktFlowWindow << "\t" 
-           << perf.pktCongestionWindow << "\t" 
-           << perf.usPktSndPeriod << "\t\t\t" 
-           << perf.pktRecvACK << "\t" 
-           << perf.pktRecvNAK << endl;
-   }
-
-   #ifndef WIN32
-      return NULL;
-   #else
-      return 0;
-   #endif
-}
-
 
 #ifndef WIN32
 void* recvdata(void* usocket)
@@ -215,7 +174,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
           buffer[seg_num].push_back(start+5);
           if(buffer[seg_num].size() == SEGMENT_SIZE / BLOCK_SIZE) {
               buffer[seg_num].decoding();
-              cout << "seg " << int(seg_num) << ":" << buffer[seg_num].length \
+              cout << "seg " << int(seg_num) << ":" << buffer[seg_num].data_size \
                   <<" blocks,"<<buffer[seg_num].decoded_data << endl;
           }
           cout<< "form socket:" << recver << ", seg_num:" << int(seg_num)<<endl;
