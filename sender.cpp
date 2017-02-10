@@ -63,6 +63,7 @@ int main(int argc, char* argv[])
         encode((uint8_t*) buffer, data_out, size, seg_num++);
         const char* data = (const char*)data_out.data();
         cout<<data_out.size()<<" bytes data encoded!"<<endl;
+        cout<<"encoded_block_size:" << ENCODED_BLOCK_SIZE <<' '<< data_out.data()<<endl;
 
         int send_size = data_out.size();
         int ssize = 0;

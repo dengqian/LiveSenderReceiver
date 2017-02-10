@@ -57,7 +57,7 @@ public:
 
         data_size = data.size();
 
-        if (data_size < SEGMENT_SIZE / BLOCK_SIZE) return;
+        if (data_size < BLOCK_NUM) return;
 
         int length = data_size * ENCODED_BLOCK_SIZE;
         
@@ -137,8 +137,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
    UDTSOCKET recver = *(UDTSOCKET*)usocket;
    delete (UDTSOCKET*)usocket;
 
-   int size = ENCODED_BLOCK_SIZE;
-   int total = 0;
+   const int size = ENCODED_BLOCK_SIZE;
 
    while (true)
    {
@@ -148,6 +147,8 @@ DWORD WINAPI recvdata(LPVOID usocket)
       // int rcv_size;
       // int var_size = sizeof(int);
       // UDT::getsockopt(recver, 0, UDT_RCVDATA, &rcv_size, &var_size);
+
+      cout<<"recving "<<ENCODED_BLOCK_SIZE<<" bytes data"<<endl;
 
       int rsize = 0;
       
@@ -161,23 +162,27 @@ DWORD WINAPI recvdata(LPVOID usocket)
 
          rsize += rs;
 
-         total += rs;
          cout<< rs <<" bytes data rcvd"<<endl;
       }
 
 
       uint8_t seg_num;
       char* start = 0;
-      cout<<"data: "<<data<<endl;
+      cout<<rsize<<" bytes data in total: "<<data<<endl;
+
       if((start = strstr(data, "seg:")) != NULL){
+
           seg_num = *(start+4); 
           buffer[seg_num].push_back(start+5);
-          if(buffer[seg_num].size() == SEGMENT_SIZE / BLOCK_SIZE) {
+
+          if(buffer[seg_num].size() == BLOCK_NUM) {
               buffer[seg_num].decoding();
               cout << "seg " << int(seg_num) << ":" << buffer[seg_num].data_size \
                   <<" blocks,"<<buffer[seg_num].decoded_data << endl;
           }
+
           cout<< "form socket:" << recver << ", seg_num:" << int(seg_num)<<endl;
+          cout<<endl;
       }
 
 
