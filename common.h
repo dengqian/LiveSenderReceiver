@@ -12,10 +12,12 @@
 #include "test_util.h"
 
 
-const int SEGMENT_SIZE = 102400*4;
+const int SEGMENT_SIZE = 10240*2*4;
 const int BLOCK_SIZE = 1024*4;
+const int DECODE_BLOCK_NUM= SEGMENT_SIZE / BLOCK_SIZE * 1.1;
 const int BLOCK_NUM = SEGMENT_SIZE / BLOCK_SIZE;
 const int ENCODED_BLOCK_SIZE = BLOCK_SIZE+BLOCK_NUM+14;
+
 
 using namespace std;
 

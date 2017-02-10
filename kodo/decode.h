@@ -10,8 +10,10 @@
 
 
 #include <kodocpp/kodocpp.hpp>
+#include "LiveSenderReceiver/common.h"
 
-const int block_size = 1024*4;
+
+const int block_size = BLOCK_SIZE;
 
 int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num) 
 {
@@ -19,6 +21,7 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
 
     uint32_t symbol_size = block_size;
     uint32_t symbols = num;
+
     std::cout<<symbols<<std::endl;
 
     // Initialize the factory with the chosen symbols and symbol size
@@ -43,39 +46,25 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
     // Keeps track of which symbols have been decoded
     std::vector<bool> decoded(symbols, false);
 
-    uint32_t offset = 1;
+    uint32_t offset = 5;
+    int cnt = 0;
 
     // Receiver loop
     while (!decoder.is_complete())
     {
+        cnt ++;
+        std::cout<<"decoding phrase "<<cnt<<endl;
         // Receive message
         // remote_address_size = sizeof(remote_address);
         memcpy(payload.data(), data_in+offset, payload_size); 
 
-        // offset += payload_size;
+        offset += payload_size + 5;
         // std::cout<<payload.data()<<std::endl;
-        offset = offset+payload_size+1;
-
-        // bytes_received = recvfrom(
-        //     socket_descriptor, (char*)payload.data(), payload_size, 0,
-        //     (struct sockaddr*) &remote_address, &remote_address_size);
-
-        // if (bytes_received < 0)
-        // {
-        //     printf("%s: recvfrom error %d\n", argv[0], bytes_received);
-        //     fflush(stdout);
-        //     continue;
-        // }
-
-        // // Print received message
-        // printf("UDP packet received from %s:%u : %d bytes\n",
-        //        inet_ntoa(remote_address.sin_addr),
-        //        ntohs(remote_address.sin_port), bytes_received);
-
 
         // Packet got through - pass that packet to the decoder
         decoder.read_payload(payload.data());
 
+        /*
         if (decoder.has_partial_decoding_interface() &&
             decoder.is_partially_complete())
         {
@@ -90,6 +79,8 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
                 }
             }
         }
+        */
+
         // std::cout<<payload.data()<<std::endl;
         payload.clear();
     }

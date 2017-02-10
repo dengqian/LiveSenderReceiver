@@ -57,7 +57,7 @@ public:
 
         data_size = data.size();
 
-        if (data_size < BLOCK_NUM) return;
+        if (data_size < DECODE_BLOCK_NUM) return;
 
         int length = data_size * ENCODED_BLOCK_SIZE;
         
@@ -173,9 +173,12 @@ DWORD WINAPI recvdata(LPVOID usocket)
       if((start = strstr(data, "seg:")) != NULL){
 
           seg_num = *(start+4); 
-          buffer[seg_num].push_back(start+5);
+          buffer[seg_num].push_back(start);
+          // cout<< start+4 << endl;
 
-          if(buffer[seg_num].size() == BLOCK_NUM) {
+          if(buffer[seg_num].size() == DECODE_BLOCK_NUM) {
+              
+              cout<< "decoding " << int(seg_num) << " segment..." <<endl;
               buffer[seg_num].decoding();
               cout << "seg " << int(seg_num) << ":" << buffer[seg_num].data_size \
                   <<" blocks,"<<buffer[seg_num].decoded_data << endl;
