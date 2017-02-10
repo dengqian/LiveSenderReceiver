@@ -34,7 +34,8 @@ vector<UDTSOCKET> regist_sock_list;
 UDTSOCKET regist_sock;
 wqueue<item*> queue;
 
-int buff_size = ENCODED_BLOCK_SIZE * BLOCK_NUM;
+int buff_size = ENCODED_BLOCK_SIZE;
+
 const int buffer_block_size = 10;
 
 
