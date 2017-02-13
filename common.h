@@ -20,7 +20,7 @@ const int ENCODED_BLOCK_SIZE = BLOCK_SIZE+BLOCK_NUM+14;
 using namespace std;
 
 const char* SENDER_TO_SERVER_PORT = "9090";
-const char* SERVER_TO_RECEIVER_PORT = "9001";
+const char* SERVER_TO_RECEIVER_PORT = "9000";
 
 const int g_serverNum = 2;  // num of cloud server
 
