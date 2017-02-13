@@ -18,8 +18,8 @@
 
 using namespace std;
 
-const char* cloud_server1 = "139.199.94.164";
-const char* cloud_server2 = "139.199.165.244";
+const char* cloud_server1 = "10.21.2.193";
+const char* cloud_server2 = "10.21.2.251";
 const char* cloud_server_port = SERVER_TO_RECEIVER_PORT;
 
 void* recvdata(void*);
