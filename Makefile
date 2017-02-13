@@ -29,7 +29,7 @@ ifeq ($(arch), SPARC)
    CCFLAGS += -DSPARC
 endif
 
-# LDFLAGS = -std=c++11 -L../src -L./kodo -ludt -lstdc++ -lpthread -lm
+#LDFLAGS = -std=c++11 -L../src -L./kodo -ludt -lstdc++ -lpthread -lm
 LDFLAGS = -std=c++11 -L../src -L./kodo -ludt -lpthread -lm
 
 ifeq ($(os), UNIX)
@@ -47,7 +47,7 @@ APP = appserver appclient sendfile recvfile test push_server sender receiver
 
 all: $(APP)
 
-KODOFLAGS =  -Wl,-Bdynamic -lkodoc -Wl,-rpath .
+KODOFLAGS = -Wl,-Bdynamic -lkodoc -Wl,-rpath .
 
 # %.o : %.cpp $(DEPDIR)/%.d
 # 	$(C++) $(CCFLAGS) $(DEPFLAGS) $< -c
