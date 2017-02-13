@@ -179,26 +179,26 @@ DWORD WINAPI recvdata(LPVOID usocket)
             break;
          }
 
-         // send data directly.
-         // int snd_size = 0;
-         // int ss;
-         // for(auto regist:regist_sock_list)
-         // {
-         // if(regist_sock_list.size() != 0)
-         // { 
-         //    while(snd_size < rs) {
-         //       
-         //       if (UDT::ERROR == (ss = UDT::send(regist_sock, \
-         //                       data + rsize + snd_size, rs - snd_size, 0)))
-         //       {
-         //          cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
-         //          regist_sock_list.pop_back();
-         //          break;
-         //       }
-         //       snd_size += ss;
-         //    }
-         //    cout<<rs<<"bytes data pushed"<<endl;
-         // }
+         /*// send data directly.
+         int snd_size = 0;
+         int ss;
+         for(auto regist:regist_sock_list)
+         {
+         if(regist_sock_list.size() != 0)
+         { 
+            while(snd_size < rs) {
+               
+               if (UDT::ERROR == (ss = UDT::send(regist_sock, \
+                               data + rsize + snd_size, rs - snd_size, 0)))
+               {
+                  cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
+                  regist_sock_list.pop_back();
+                  break;
+               }
+               snd_size += ss;
+            }
+            cout<<rs<<"bytes data pushed"<<endl;
+         }*/
 
          // add to shared buffer.
         

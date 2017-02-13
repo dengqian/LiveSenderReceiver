@@ -11,9 +11,11 @@
 #include <vector>
 
 #include <kodocpp/kodocpp.hpp>
+
+#include "LiveSenderReceiver/common.h"
 #include <iostream>
 
-const int block_size = 1024*4;
+const int block_size = BLOCK_SIZE;
 
 int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint8_t segment_number)
 {
@@ -40,7 +42,7 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint8_t segm
     const char* tag = "seg:";
     uint8_t* tag_t = (uint8_t*)tag;
 
-    for (uint32_t i = 0; i < symbols+1; ++i)
+    for (uint32_t i = 0; i < symbols*1.1; ++i)
     {
         // Add a new symbol if the encoder rank is less than the maximum number
         // of symbols
@@ -51,9 +53,10 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint8_t segm
             uint8_t* symbol = data_in.data() + rank * encoder.symbol_size();
             encoder.set_const_symbol(rank, symbol, encoder.symbol_size());
         }
-        uint32_t bytes_used = encoder.write_payload(payload.data());
-        
 
+        //uint32_t bytes_used = encoder.write_payload(payload.data());
+        encoder.write_payload(payload.data());
+        
         int len = data_out.size();
 
         data_out.insert(data_out.end(), tag_t, tag_t+4);

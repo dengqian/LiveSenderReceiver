@@ -11,7 +11,7 @@ ifndef arch
    arch = IA32
 endif
 
-CCFLAGS = -std=c++11 -Wall -D$(os) -I../src -I./ -I./kodo/include -finline-functions -O3
+CCFLAGS = -std=c++11 -Wall -D$(os) -I../src -I../ -I./kodo/include -finline-functions -O3
 
 ifeq ($(arch), IA32)
    CCFLAGS += -DIA32 #-mcpu=pentiumpro -march=pentiumpro -mmmx -msse
