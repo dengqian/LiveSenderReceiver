@@ -1,3 +1,4 @@
+#ifndef _COMMON_H_
 #define _COMMON_H_
 
 #include <unistd.h>
@@ -19,9 +20,6 @@ const int ENCODED_BLOCK_SIZE = BLOCK_SIZE+BLOCK_NUM+14;
 
 
 using namespace std;
-
-const char* cloud_server1 = "10.21.2.193";
-const char* cloud_server2 = "192.168.1.2";
 
 const char* SENDER_TO_SERVER_PORT = "9090";
 const char* SERVER_TO_RECEIVER_PORT = "9000";
