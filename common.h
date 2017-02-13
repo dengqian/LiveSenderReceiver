@@ -1,4 +1,3 @@
-#ifndef _COMMON_H_
 #define _COMMON_H_
 
 #include <unistd.h>
@@ -12,12 +11,15 @@
 #include "test_util.h"
 
 
-const int SEGMENT_SIZE = 102400*4;
+const int SEGMENT_SIZE = 1024*4*20;
 const int BLOCK_SIZE = 1024*4;
 const int BLOCK_NUM = SEGMENT_SIZE / BLOCK_SIZE;
 const int ENCODED_BLOCK_SIZE = BLOCK_SIZE+BLOCK_NUM+14;
 
 using namespace std;
+
+const char* cloud_server1 = "10.21.2.193";
+const char* cloud_server2 = "192.168.1.2";
 
 const char* SENDER_TO_SERVER_PORT = "9090";
 const char* SERVER_TO_RECEIVER_PORT = "9000";
