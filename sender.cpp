@@ -20,8 +20,8 @@
 
 using namespace std;
 
-// const char* cloud_server1 = "10.21.2.193";
-// const char* cloud_server2 = "192.168.1.2";
+const char* cloud_server1 = "10.21.2.193";
+const char* cloud_server2 = "192.168.1.2";
 const char* cloud_server_port = SENDER_TO_SERVER_PORT;
 
 
