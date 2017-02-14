@@ -59,13 +59,14 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t seg
         
         int len = data_out.size();
         uint8_t d[4] = {0};
-        for (int i=0; i<4 ;++i)
+        for (int i=0; i<4 ;++i){
             d[i] = ((uint8_t*)&segment_number)[3-i];
-
-        cout<<d<<endl;
+			std::cout<<int(d[i])<<std::endl;
+		}
 
         data_out.insert(data_out.end(), tag_t, tag_t+4);
-        data_out.push_back(segment_number);
+        // data_out.push_back(segment_number);
+		data_out.insert(data_out.end(), d, d+4);
         data_out.insert(data_out.end(), payload.begin(), payload.end());
 
         std::cout<<int(segment_number)<<' '<<data_out.size()-len<<std::endl;
