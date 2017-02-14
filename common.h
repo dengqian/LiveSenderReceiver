@@ -1,6 +1,6 @@
 #ifndef _COMMON_H_
 #define _COMMON_H_
-
+///////
 #include <unistd.h>
 #include <cstdlib>
 #include <cstring>
@@ -16,7 +16,8 @@ const int SEGMENT_SIZE = 1024*4*20;
 const int BLOCK_SIZE = 1024*4;
 const int DECODE_BLOCK_NUM= SEGMENT_SIZE / BLOCK_SIZE * 1.1;
 const int BLOCK_NUM = SEGMENT_SIZE / BLOCK_SIZE;
-const int ENCODED_BLOCK_SIZE = BLOCK_SIZE+BLOCK_NUM+14;
+// 4 bytes for seg:, 4 bytes for seg_num
+const int ENCODED_BLOCK_SIZE = BLOCK_SIZE+BLOCK_NUM+9+4+4;
 
 
 using namespace std;
