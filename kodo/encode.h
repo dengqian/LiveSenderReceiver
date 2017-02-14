@@ -17,7 +17,7 @@
 
 const int block_size = BLOCK_SIZE;
 
-int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint8_t segment_number)
+int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t segment_number)
 {
     uint32_t symbol_size = block_size; // encode block size
     uint32_t symbols = size / symbol_size ; // number of blocks to be encoded.
@@ -58,6 +58,11 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint8_t segm
         encoder.write_payload(payload.data());
         
         int len = data_out.size();
+        uint8_t d[4] = {0};
+        for (int i=0; i<4 ;++i)
+            d[i] = ((uint8_t*)&segment_number)[3-i];
+
+        cout<<d<<endl;
 
         data_out.insert(data_out.end(), tag_t, tag_t+4);
         data_out.push_back(segment_number);

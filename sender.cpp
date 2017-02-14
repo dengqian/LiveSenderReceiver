@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 
     const int size = SEGMENT_SIZE;
     char* buffer = new char[size];
-    uint8_t seg_num = 0;
+    uint32_t seg_num = 0;
 
     while(!in.eof()){
 
