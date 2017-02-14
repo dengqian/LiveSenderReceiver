@@ -79,7 +79,7 @@ public:
 };
 
 
-map<uint8_t, recv_data>buffer; 
+map<uint32_t, recv_data>buffer; 
 
 
 int main(int argc, char* argv[])
@@ -166,15 +166,17 @@ DWORD WINAPI recvdata(LPVOID usocket)
       }
 
 
-      uint8_t seg_num;
+      uint32_t seg_num;
       char* start = 0;
       cout<<rsize<<" bytes data in total: "<<data<<endl;
 
       if((start = strstr(data, "seg:")) != NULL){
 
-          seg_num = *(start+4); 
-          buffer[seg_num].push_back(start);
-          // cout<< start+4 << endl;
+          memcpy(&seg_num, start + 4, sizeof(int32_t));
+          cout<< seg_num << ' ' << endl;
+          // seg_num = *((uint32_t*)start+4);
+          buffer[seg_num].push_back(start+8);
+          cout<< start+4 << endl;
 
           if(buffer[seg_num].size() == DECODE_BLOCK_NUM) {
               
