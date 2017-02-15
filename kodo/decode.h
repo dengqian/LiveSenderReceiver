@@ -13,14 +13,13 @@
 #include "LiveSenderReceiver/common.h"
 
 
-const int block_size = BLOCK_SIZE;
 
 int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num) 
 {
 
 
-    uint32_t symbol_size = block_size;
-    uint32_t symbols = num;
+    uint32_t symbol_size = BLOCK_SIZE;
+    uint32_t symbols = BLOCK_NUM;
 
     std::cout<<symbols<<std::endl;
 
@@ -46,7 +45,7 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
     // Keeps track of which symbols have been decoded
     std::vector<bool> decoded(symbols, false);
 
-    uint32_t offset = 5;
+    uint32_t offset = 0;
     int cnt = 0;
 
     // Receiver loop
@@ -58,7 +57,7 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
         // remote_address_size = sizeof(remote_address);
         memcpy(payload.data(), data_in+offset, payload_size); 
 
-        offset += payload_size + 5;
+        offset += payload_size;
         // std::cout<<payload.data()<<std::endl;
 
         // Packet got through - pass that packet to the decoder
