@@ -60,7 +60,7 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t seg
         int len = data_out.size();
         uint8_t d[4] = {0};
         for (int i=0; i<4 ;++i){
-            d[i] = ((uint8_t*)&segment_number)[3-i];
+            d[i] = ((uint8_t*)&segment_number)[i];
 			std::cout<<int(d[i])<<std::endl;
 		}
 
