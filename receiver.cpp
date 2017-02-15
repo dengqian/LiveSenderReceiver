@@ -172,15 +172,15 @@ DWORD WINAPI recvdata(LPVOID usocket)
 
       if((start = strstr(data, "seg:")) != NULL){
 
-          memcpy(&seg_num, start + 4, sizeof(int32_t));
+          memcpy(&seg_num, start + 4, sizeof(uint32_t));
           cout<< seg_num << ' ' << endl;
           // seg_num = *((uint32_t*)start+4);
           buffer[seg_num].push_back(start+8);
-          cout<< start+4 << endl;
+          cout<< start << endl;
 
           if(buffer[seg_num].size() == DECODE_BLOCK_NUM) {
               
-              cout<< "decoding " << int(seg_num) << " segment..." <<endl;
+              cout<< "decoding segment: " << seg_num <<endl;
               buffer[seg_num].decoding();
               cout << "seg " << int(seg_num) << ":" << buffer[seg_num].data_size \
                   <<" blocks,"<<buffer[seg_num].decoded_data << endl;
