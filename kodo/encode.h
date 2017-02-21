@@ -61,7 +61,7 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t seg
         uint8_t d[4] = {0};
         for (int i=0; i<4 ;++i){
             d[i] = ((uint8_t*)&segment_number)[i];
-			std::cout<<int(d[i])<<std::endl;
+			//std::cout<<int(d[i])<<std::endl;
 		}
 
         data_out.insert(data_out.end(), tag_t, tag_t+4);
@@ -69,7 +69,7 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t seg
 		data_out.insert(data_out.end(), d, d+4);
         data_out.insert(data_out.end(), payload.begin(), payload.end());
 
-        std::cout<<int(segment_number)<<' '<<data_out.size()-len<<std::endl;
+        //std::cout<<int(segment_number)<<' '<<data_out.size()-len<<std::endl;
         // return_code = sendto(socket_descriptor, (const char*)payload.data(),
         //                      bytes_used, 0, (struct sockaddr*) &remote_address,
         //                      sizeof(remote_address));

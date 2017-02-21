@@ -18,7 +18,7 @@
 #include "./common.h"
 #include "../src/common.h"
 #define EPSILON 1e-3
-//#define FIXED_BW
+#define FIXED_BW
 
 using namespace std;
 
@@ -28,73 +28,68 @@ const char* cloud_server_port = SENDER_TO_SERVER_PORT;
 
 class item{
 public:
-    char * data;
+    const char * data;
     int begin;
     int end;
 
-    item(char* dat, int b, int e):data(dat),begin(b),end(e){}
+    item(const char* dat, int b, int e):data(dat),begin(b),end(e){}
     ~item(){}
 };
 
-wquque<item*> queue1;
-wquque<item*> queue2;
+wqueue<item*> queue1;
+wqueue<item*> queue2;
 
-void* pushdata(void* usocket)
+volatile double sendrate1 = -1.0;
+volatile double sendrate2 = -1.0;
+
+struct ARGS{
+	UDTSOCKET usocket;
+	wqueue<item*> *queue;
+};
+
+void* pushdata(void* args)
 {
-   UDTSOCKET client = *(UDTSOCKET*)usocket;
-   delete (UDTSOCKET*)usocket;
-
+	ARGS arg = *(ARGS*)args;
+	UDTSOCKET client = arg.usocket;
+	wqueue<item *> *queue = arg.queue;
+ 
    int size = 0;
-   int s=queue.size();
-
-   char* data_addr = queue.front()->data;
-
-   // init buffer block size can't exceed buffer_block_size.
-   if(s > buffer_block_size)
-   {
-       // cout<<"initial size:"<<s<<endl;
-       for(int i=0; i<s-buffer_block_size; i++){
-           item* it = queue.pop_front();
-
-           if(it->data != data_addr){
-                char* data_pushed = data_addr;
-                delete [] data_pushed;
-                data_addr = it->data;
-           }
-       }
-   }
-
+   const char* data_addr = queue->front()->data;
    while(true){
-
-       item* it = queue.pop_front();
-
-       // pointer changed, delete data from queue.
-       if(it->data != data_addr){
-           cout<< "queue size:" << queue.size() << " " <<size<<" bytes data pushed" <<endl;
-           char* data_pushed = data_addr;
-           delete [] data_pushed;
-           data_addr = it->data;
-       }
-
+       item* it = queue->pop_front();
        int snd_size = 0;
        int ss = 0;
-
+	   //UDT::TRACEINFO perf;
+	   //UDT::perfmon(client, &perf);
+	   uint64_t last_time = CTimer::getTime();
        while(snd_size < it->end-it->begin) {
-          
-          if (UDT::ERROR == (ss = UDT::send(client, \
+         cout << "data size : " << it->end - it->begin <<endl; 
+		  if (UDT::ERROR == (ss = UDT::send(client, \
                          it->data+it->begin+snd_size, it->end-it->begin-snd_size, 0)))
           {
              cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
-             regist_sock_list.pop_back();
              return 0 ;
           }
+		  cout << "snd_size : " << ss <<endl;
           snd_size += ss;
           size += ss;
        }
+	   uint64_t time_used = CTimer::getTime() - last_time;
+	   cout << "send  data completed." << endl;
+	   //UDT::perfmon(client, &perf);
+	   if (queue == &queue1){
+	       //sendrate1 = perf.mbpsSendRate;
+		   
+	       sendrate1 = snd_size * 8.0 / (time_used * 1000);
+		   cout << "sendrate1 : " << sendrate1 << endl;
+		}
+	   else if (queue == &queue2){
+	       //sendrate2 = perf.mbpsSendRate;
+	       sendrate2 = snd_size * 8.0 / (time_used * 1000);
+		   cout << "sendrate2 : " << sendrate2 << endl;
+	   }
    }
-
    return 0;
-
 }
 
 
@@ -104,7 +99,7 @@ int main(int argc, char* argv[])
 {
    if (2 != argc)
    {
-      cout << "usage: appclient filename" << endl;
+      cout << "usage: sender filename" << endl;
       return 0;
    }
 
@@ -115,142 +110,97 @@ int main(int argc, char* argv[])
    connect(client1, cloud_server1, cloud_server_port);
    connect(client2, cloud_server2, cloud_server_port);
    
-   // test connection bandwidth
-   UDT::TRACEINFO perf1;
-   UDT::TRACEINFO perf2;
-   // #ifndef WIN32
-   //    pthread_create(new pthread_t, NULL, monitor, &client2);
-   // #else
-   //    CreateThread(NULL, 0, monitor, &client2, 0, NULL);
-   // #endif
+   #ifndef WIN32
+		ARGS arg1, arg2;
+		arg1.usocket = client1;
+		arg1.queue = &queue1;
+		arg2.usocket = client2;
+		arg2.queue = &queue2;	
+		pthread_t thread1, thread2;
+        pthread_create(&thread1, NULL, pushdata, &arg1);
+        pthread_create(&thread2, NULL, pushdata, &arg2);
+   #else
+      CreateThread(NULL, 0, monitor, &client2, 0, NULL);
+   #endif
 
     
     fstream in(argv[1], ios::in | ios::binary);
 
     const int size = SEGMENT_SIZE;
-    char* buffer = new char[size];
     uint32_t seg_num = 0;
     bool first_test = true;
-	vector<int> factor(2, 1);  //default trasmit data with 1:1
+	int factor1 = 1, factor2 = 1;  //default trasmit data with 1:1
+
+	char* buffer = new char[size];
+    vector<uint8_t> data_out;
     while(!in.eof()){
         in.read(buffer, size); 
-
-        vector<uint8_t> data_out;
-        encode((uint8_t*) buffer, data_out, size, seg_num++);
+		while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
+        data_out.clear();
+		encode((uint8_t*) buffer, data_out, size, seg_num++);
         const char* data = (const char*)data_out.data();
 		cout << "-----------------------------------------" << endl;
+		cout << "position : " << in.tellg() << endl;
         cout<<data_out.size()<<" bytes data encoded!"<<endl;
-        cout<<"encoded_block_size:" << ENCODED_BLOCK_SIZE <<' '<< data_out.data()<<endl;
-
-		for(int i=0; i<2; i++)
-			cout << "factor " << i << " is :" << factor[i] << endl;
-		vector<double> sendrate(2, 0);
-        int send_size = data_out.size();
-        int ssize = 0;
-        int ss;
-		uint64_t perf1_time = 0;
-		uint64_t perf2_time = 0;
-		int ss1 = 0, ss2 = 0;	
-        while (ssize < send_size)
-        {
-		   uint64_t last_time = CTimer::getTime();   // in ms
-           if (UDT::ERROR == (ss = UDT::send(client1, data + ssize, ENCODED_BLOCK_SIZE*factor[0], 0)))
-           {
-              cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
-              return 0;
-           }
-		   perf1_time += CTimer::getTime() - last_time;
-		   ssize += ss;
-		   ss1 += ss;
-		   if ( first_test )
-				ssize -= ss; 
-		   if(ssize >= send_size) 
-               break;
-			
-		   last_time = CTimer::getTime();	
-           if (UDT::ERROR == (ss = UDT::send(client2, data + ssize, ENCODED_BLOCK_SIZE*factor[1], 0)))
-           {
-              cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
-              return 0;
-           }	
-		   perf2_time += CTimer::getTime() - last_time;
-		   ssize += ss;
-		   ss2 += ss;
-        }
-		UDT::perfmon(client1, &perf1);
-		cout << "1 : pkt sent : " << perf1.pktSent << endl;
-		cout << "1 : data size : " << ss1 << endl;
-		cout << "1 : perf time: " << perf1_time << endl;
-		if (perf1_time > 0)
-			//sendrate[0] = double(perf1.pktSent) * 1456 *8.0 / (perf1_time * 1000) ;
-			sendrate[0] = double(ss1)*8.0 / (perf1_time * 1000) ;
-		else {      //if no data has been sent, perf_time will be zero
-			sendrate[0] = 0;
+        cout<<"encoded_block_size:" << ENCODED_BLOCK_SIZE <<' '<< data_out.data()<<endl;		
+		//to do; compute factor
+		if ( sendrate1 > EPSILON && sendrate2 > EPSILON) {
+		    double res = sendrate1 > sendrate2 ? sendrate1 / sendrate2 : sendrate2 / sendrate1;
+			if (sendrate1 > sendrate2){
+				factor1 = (int)(res + 0.5);
+				factor2 = 1;
+				if (factor1 > 10){
+					factor1 = BLOCK_NUM; 
+					factor2 = ENCODED_BLOCK_NUM - BLOCK_NUM;   // the mbps gap is too large , so transmit on only one link, the other link only transmit the redundant data
+				}
+			}
+			else{
+				factor1 = 1;
+				factor2 = (int)(res + 0.5);
+				if (factor2 > 10){
+					factor1 = ENCODED_BLOCK_NUM - BLOCK_NUM;
+					factor2 = BLOCK_NUM;
+				}
+			}
 		}
-		//cout << "send duration : " << perf1_time << endl;  
+		else if (sendrate1 <= EPSILON && sendrate2 <= EPSILON){
+			factor1 = factor2 = 1;
+		}
+		else if (sendrate1 <= EPSILON){
+			factor1 = 1;
+		}
+		else {
+			factor2 = 1;
+		}
+		sendrate1 = sendrate2 = 0;
+		#ifdef FIXED_BW
+		factor1 = 2;
+		factor2 = 1;
+		#endif
+		cout << "factor1 : " << factor1 << endl;
+		cout << "factor2 : " << factor2 << endl;
+		if (sendrate1 < -EPSILON && sendrate2 < -EPSILON){
+			queue1.add(new item(data, 0, SEGMENT_SIZE));
+			queue2.add(new item(data, 0, SEGMENT_SIZE));  
+		}
+		else {
+			int num1 = ENCODED_BLOCK_NUM * ((double)factor1/(factor1+factor2));
+			cout << "block num of link1 : " << num1 <<endl;
+			int datasize1 = ENCODED_BLOCK_SIZE * num1;	
+			int datasize2 = ENCODED_BLOCK_SIZE * (ENCODED_BLOCK_NUM - num1);
+			queue1.add(new item(data, 0, datasize1));
+			queue2.add(new item(data, datasize1, datasize1+datasize2));  
+		}
 		
-		UDT::perfmon(client2, &perf2);
-		cout << "2 : pkt sent : " << perf2.pktSent << endl;
-		cout << "2 : data size : " << ss2 << endl;
-		cout << "2 : perf time: " << perf2_time << endl;
-
-		if (perf2_time > 0)
-			//sendrate[1] = double(perf2.pktSent) * 1456 *8.0 / (perf2_time * 1000);
-			sendrate[1] = double(ss2)*8.0 / (perf2_time * 1000) ;
-        else {
-			sendrate[1] = 0;
-		}
-			
-		if (ssize < send_size)
-           break;
-        cout<<"segment sent completed"<<endl;
-		//compute the factor
-		cout << "rate 0 : " << sendrate[0] << "    rate 1 : " << sendrate[1] << endl;
-		// first test
+		// first sending is a link-rate test
 		if ( first_test ){
 			first_test = false;
 			in.seekg(0, ios::beg);
 		}
-		double res = 0;
-		if ( sendrate[0] > EPSILON && sendrate[1] > EPSILON) 
-		    res = sendrate[0] > sendrate[1] ? sendrate[0]/sendrate[1] : sendrate[1] / sendrate[0];
-		else if (sendrate[0] <= EPSILON && sendrate[1] <= EPSILON){
-			factor[0] = factor[1] = 1;
-			continue;
-		}
-		else if (sendrate[0] <= EPSILON){
-			factor[0] = 1;
-			continue;
-		}
-		else {
-			factor[1] = 1;
-			continue;
-		}
-		if (sendrate[0] > sendrate[1]){
-			factor[0] = (int)(res + 0.5);
-			factor[1] = 1;
-			if (factor[0] > 10){
-				factor[0] = 5;
-				factor[1] = 0;   // the mbps gap is too large , so transmit on only one link
-			}
-		}
-		else{
-			factor[0] = 1;
-			factor[1] = (int)(res + 0.5);
-			if (factor[1] > 10){
-				factor[0] = 0;
-				factor[1] = 5;
-			}
-		}
-		#ifdef FIXED_BW
-		factor[0] = 2;
-		factor[1] = 1;
-		#endif
-	//	for(int i=0; i<2; i++)
-	//		cout << "factor " << i << " is :" << factor[i] << endl;
-		
     }
    
+	pthread_join(thread1, NULL);
+	pthread_join(thread2, NULL);
     in.close();
    
    UDT::close(client1);

@@ -53,30 +53,33 @@ public:
         return data.size();
     }
 
-    void decoding(){
-
-        data_size = data.size();
-
-        if (data_size < DECODE_BLOCK_NUM) return;
-
-        int length = data_size * ENCODED_BLOCK_SIZE;
-        
-        char* data_in = new char[length];
-        strcpy(data_in, data[0]);
-
-        for(int i=1; i<data_size; i++){
-            strcat(data_in, data[i]); 
-        }
-
-        vector<uint8_t> data_out;
-        decode((uint8_t*)data_in, data_out, data_size); 
-        decoded_data = (const char*)data_out.data();
-
-        data.clear();
-        delete [] data_in;
-    }
+	void decoding();
 
 };
+
+void recv_data::decoding(){
+
+    data_size = data.size();
+
+    if (data_size < DECODE_BLOCK_NUM) return;
+
+    int length = data_size * ENCODED_BLOCK_SIZE;
+    
+    char* data_in = new char[length];
+    strcpy(data_in, data[0]);
+
+    for(int i=1; i<data_size; i++){
+        strcat(data_in, data[i]); 
+    }
+
+    vector<uint8_t> data_out;
+    decode((uint8_t*)data_in, data_out, data_size); 
+    decoded_data = (const char*)data_out.data();
+
+    data.clear();
+    delete [] data_in;
+}
+
 
 
 map<uint32_t, recv_data>buffer; 
