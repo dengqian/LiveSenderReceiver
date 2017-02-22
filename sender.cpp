@@ -133,19 +133,24 @@ int main(int argc, char* argv[])
 	int factor1 = 1, factor2 = 1;  //default trasmit data with 1:1
 
 	char* buffer = new char[size];
+	memset(buffer, 0, size);
     vector<uint8_t> data_out;
+
     while(!in.fail() && !in.eof()) {
         in.read(buffer, size); 
 
 		while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
+
         data_out.clear();
 		encode((uint8_t*) buffer, data_out, size, seg_num++);
         const char* data = (const char*)data_out.data();
+
 		cout << "-----------------------------------------" << endl;
 		// cout << in.tellg() << ' ' << in.fail() << ' ' << in.eof() << endl;
         cout<<data_out.size()<<" bytes data encoded!"<<endl;
         cout<<"encoded_block_size:" << ENCODED_BLOCK_SIZE <<' '<< data_out.data()<<endl;		
 		//to do; compute factor
+
 		if ( sendrate1 > EPSILON && sendrate2 > EPSILON) {
 		    double res = sendrate1 > sendrate2 ? sendrate1 / sendrate2 : sendrate2 / sendrate1;
 			if (sendrate1 > sendrate2){
