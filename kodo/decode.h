@@ -37,13 +37,13 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
     std::vector<uint8_t> payload(payload_size);
 
     // Set the storage for the decoder
-    // std::cout<<decoder.block_size()<<'\n';
     // std::vector<uint8_t> data_out(decoder.block_size());
     data_out.resize(decoder.block_size());
+
     decoder.set_mutable_symbols(data_out.data(), decoder.block_size());
 
     // Keeps track of which symbols have been decoded
-    std::vector<bool> decoded(symbols, false);
+    // std::vector<bool> decoded(symbols, false);
 
     uint32_t offset = 0;
     int cnt = 0;
@@ -52,17 +52,18 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
     while (!decoder.is_complete())
     {
         cnt ++;
-        std::cout<<"decoding phrase "<<cnt<<endl;
-        // Receive message
-        // remote_address_size = sizeof(remote_address);
-        memcpy(payload.data(), data_in+offset, payload_size); 
+        // std::cout<<"decoding phrase "<<cnt<<endl;
 
+        memcpy(payload.data(), data_in+offset, payload_size); 
         offset += payload_size;
-        // std::cout<<payload.data()<<std::endl;
 
         // Packet got through - pass that packet to the decoder
         decoder.read_payload(payload.data());
 
+        if(cnt > DECODE_BLOCK_NUM) {
+            std::cout << "Data decode failed!" << std::endl;
+            return 0;
+        }
         /*
         if (decoder.has_partial_decoding_interface() &&
             decoder.is_partially_complete())
@@ -80,12 +81,10 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
         }
         */
 
-        // std::cout<<payload.data()<<std::endl;
         payload.clear();
     }
 
-    printf("Data decoded!");
-    // std::cout<<data_out.size()<<' '<<data_out.data()<<'\n';
+    printf("Data decoded!\n");
 
     return 0; 
 

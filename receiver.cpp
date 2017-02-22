@@ -147,12 +147,6 @@ DWORD WINAPI recvdata(LPVOID usocket)
       int rs;
       char* data = new char[size];
 
-      // int rcv_size;
-      // int var_size = sizeof(int);
-      // UDT::getsockopt(recver, 0, UDT_RCVDATA, &rcv_size, &var_size);
-
-      cout<<"recving "<<ENCODED_BLOCK_SIZE<<" bytes data"<<endl;
-
       int rsize = 0;
       
       while(rsize < size){
@@ -164,46 +158,37 @@ DWORD WINAPI recvdata(LPVOID usocket)
          }
 
          rsize += rs;
-
-         cout<< rs <<" bytes data rcvd"<<endl;
       }
 
+      cout << "------------------------------------------" << endl;
+      cout<< "recved " << ENCODED_BLOCK_SIZE <<" bytes data."<< endl;
 
       uint32_t seg_num;
       char* start = 0;
-      cout<<rsize<<" bytes data in total: "<<data<<endl;
 
       if((start = strstr(data, "seg:")) != NULL){
+          if (start != data) cout << "block not integrated" << endl;
 
           memcpy(&seg_num, start + 4, sizeof(uint32_t));
-          cout<< seg_num << ' ' << endl;
-          // seg_num = *((uint32_t*)start+4);
           buffer[seg_num].push_back(start+8);
-          cout<< start << endl;
+          cout << start << endl;
+          
+          cout<< "form socket:" << recver << ", seg_num:" << seg_num << endl;
 
           if(buffer[seg_num].size() == DECODE_BLOCK_NUM) {
               
               cout<< "decoding segment: " << seg_num <<endl;
               buffer[seg_num].decoding();
-              cout << "seg " << int(seg_num) << ":" << buffer[seg_num].data_size \
-                  <<" blocks,"<<buffer[seg_num].decoded_data << endl;
+              cout << "seg " << seg_num << ":" << buffer[seg_num].data_size \
+                  <<" blocks" << endl;
           }
 
-          cout<< "form socket:" << recver << ", seg_num:" << int(seg_num)<<endl;
           cout<<endl;
       }
 
-
-      // vector<uint8_t> decode_data;
-      // decode((uint8_t*)data, decode_data, size); 
-      // const char* data_decoded = (const char*)decode_data.data();
-      // cout<<data_decoded<<endl;
-	
-      // cout<<"recvd data:"<<rs<<" bytes. "<<data<<endl;
    }
 
 
-   // delete [] data;
 
    UDT::close(recver);
 
