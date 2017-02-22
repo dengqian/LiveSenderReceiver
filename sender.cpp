@@ -93,7 +93,6 @@ void* pushdata(void* args)
 }
 
 
-// void* monitor(void*);
 
 int main(int argc, char* argv[])
 {
@@ -119,6 +118,8 @@ int main(int argc, char* argv[])
 		pthread_t thread1, thread2;
         pthread_create(&thread1, NULL, pushdata, &arg1);
         pthread_create(&thread2, NULL, pushdata, &arg2);
+		pthread_detach(thread1);
+		pthread_detach(thread2);
    #else
       CreateThread(NULL, 0, monitor, &client2, 0, NULL);
    #endif
@@ -133,14 +134,15 @@ int main(int argc, char* argv[])
 
 	char* buffer = new char[size];
     vector<uint8_t> data_out;
-    while(!in.eof()){
+    while(!in.fail() && !in.eof()) {
         in.read(buffer, size); 
+
 		while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
         data_out.clear();
 		encode((uint8_t*) buffer, data_out, size, seg_num++);
         const char* data = (const char*)data_out.data();
 		cout << "-----------------------------------------" << endl;
-		cout << "position : " << in.tellg() << endl;
+		// cout << in.tellg() << ' ' << in.fail() << ' ' << in.eof() << endl;
         cout<<data_out.size()<<" bytes data encoded!"<<endl;
         cout<<"encoded_block_size:" << ENCODED_BLOCK_SIZE <<' '<< data_out.data()<<endl;		
 		//to do; compute factor
@@ -198,9 +200,7 @@ int main(int argc, char* argv[])
 			in.seekg(0, ios::beg);
 		}
     }
-   
-	pthread_join(thread1, NULL);
-	pthread_join(thread2, NULL);
+
     in.close();
    
    UDT::close(client1);

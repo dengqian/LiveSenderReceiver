@@ -41,12 +41,18 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t seg
 
     const char* tag = "seg:";
     uint8_t* tag_t = (uint8_t*)tag;
+	uint32_t last_rank = -1, rank = 0;
 
     for (uint32_t i = 0; i < symbols*1.1; ++i)
     {
         // Add a new symbol if the encoder rank is less than the maximum number
         // of symbols
-        uint32_t rank = encoder.rank();
+        rank = encoder.rank();
+		if (rank == last_rank && rank < symbols){
+			--i;
+			continue;
+		}
+
         if (rank < encoder.symbols())
         {
             // Calculate the offset to the next symbol to insert
@@ -69,19 +75,9 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t seg
 		data_out.insert(data_out.end(), d, d+4);
         data_out.insert(data_out.end(), payload.begin(), payload.end());
 
-        //std::cout<<int(segment_number)<<' '<<data_out.size()-len<<std::endl;
-        // return_code = sendto(socket_descriptor, (const char*)payload.data(),
-        //                      bytes_used, 0, (struct sockaddr*) &remote_address,
-        //                      sizeof(remote_address));
+		last_rank = rank;
 
-        // if (return_code < 0)
-        // {
-        //     printf("%s: cannot send packet %d \n", argv[0], i - 1);
-        //     exit(1);
-        // }
-
-        // sleep_here(delay);
-    }
+     }
     // std::cout<<data_out.data()<<std::endl;
     
     return 0;
