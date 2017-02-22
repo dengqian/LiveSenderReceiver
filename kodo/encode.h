@@ -17,10 +17,10 @@
 
 const int block_size = BLOCK_SIZE;
 
-int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t segment_number)
+int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_number)
 {
     uint32_t symbol_size = block_size; // encode block size
-    uint32_t symbols = size / symbol_size ; // number of blocks to be encoded.
+    uint32_t symbols = BLOCK_NUM; // number of blocks to be encoded.
 
     if(symbols == 0) symbols = 1; // number of blocks can't be 0.
 
@@ -35,19 +35,25 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t seg
     // Create the buffer needed for the payload
     uint32_t payload_size = encoder.payload_size();
     std::vector<uint8_t> payload(payload_size);
-    std::vector<uint8_t> data_in(data, data+size); 
+    std::vector<uint8_t> data_in(data, data+SEGMENT_SIZE); 
     // std::vector<uint8_t> data_out;
 
 
     const char* tag = "seg:";
     uint8_t* tag_t = (uint8_t*)tag;
 	uint32_t last_rank = -1, rank = 0;
+	int cnt = 0;
+	
+	using std::cout;
+	using std::endl;
 
     for (uint32_t i = 0; i < symbols*1.1; ++i)
     {
         // Add a new symbol if the encoder rank is less than the maximum number
         // of symbols
+		cnt ++;
         rank = encoder.rank();
+		cout<<i<<" current rank: " << rank << endl;	
 		if (rank == last_rank && rank < symbols){
 			--i;
 			continue;
@@ -63,7 +69,8 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, int size, uint32_t seg
         //uint32_t bytes_used = encoder.write_payload(payload.data());
         encoder.write_payload(payload.data());
         
-        int len = data_out.size();
+        // int len = data_out.size();
+
         uint8_t d[4] = {0};
         for (int i=0; i<4 ;++i){
             d[i] = ((uint8_t*)&segment_number)[i];
