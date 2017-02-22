@@ -54,7 +54,7 @@ void* pushdata(void* args)
 	wqueue<item *> *queue = arg.queue;
  
    int size = 0;
-   const char* data_addr = queue->front()->data;
+
    while(true){
        item* it = queue->pop_front();
        int snd_size = 0;
@@ -142,7 +142,7 @@ int main(int argc, char* argv[])
 		while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
 
         data_out.clear();
-		encode((uint8_t*) buffer, data_out, size, seg_num++);
+		encode((uint8_t*) buffer, data_out, seg_num++);
         const char* data = (const char*)data_out.data();
 
 		cout << "-----------------------------------------" << endl;
