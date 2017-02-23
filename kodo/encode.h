@@ -15,11 +15,10 @@
 #include "LiveSenderReceiver/common.h"
 #include <iostream>
 
-const int block_size = BLOCK_SIZE;
 
 int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_number)
 {
-    uint32_t symbol_size = block_size; // encode block size
+    uint32_t symbol_size = BLOCK_SIZE; // encode block size
     uint32_t symbols = BLOCK_NUM; // number of blocks to be encoded.
 
     if(symbols == 0) symbols = 1; // number of blocks can't be 0.
@@ -35,8 +34,9 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
     // Create the buffer needed for the payload
     uint32_t payload_size = encoder.payload_size();
     std::vector<uint8_t> payload(payload_size);
-    std::vector<uint8_t> data_in(data, data+SEGMENT_SIZE); 
-    // std::vector<uint8_t> data_out;
+
+    // std::vector<uint8_t> data_in(data, data+SEGMENT_SIZE); 
+    // encoder.set_const_symbols(data, SEGMENT_SIZE);
 
 
     const char* tag = "seg:";
@@ -54,31 +54,30 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
 		cnt ++;
         rank = encoder.rank();
 		cout<<i<<" current rank: " << rank << endl;	
+
 		if (rank == last_rank && rank < symbols){
 			--i;
 			continue;
 		}
+        cout << encoder.symbol_size() << endl;
 
         if (rank < encoder.symbols())
         {
             // Calculate the offset to the next symbol to insert
-            uint8_t* symbol = data_in.data() + rank * encoder.symbol_size();
+            uint8_t* symbol = data + rank * encoder.symbol_size();
             encoder.set_const_symbol(rank, symbol, encoder.symbol_size());
         }
 
         //uint32_t bytes_used = encoder.write_payload(payload.data());
         encoder.write_payload(payload.data());
         
-        // int len = data_out.size();
 
         uint8_t d[4] = {0};
         for (int i=0; i<4 ;++i){
             d[i] = ((uint8_t*)&segment_number)[i];
-			//std::cout<<int(d[i])<<std::endl;
 		}
 
         data_out.insert(data_out.end(), tag_t, tag_t+4);
-        // data_out.push_back(segment_number);
 		data_out.insert(data_out.end(), d, d+4);
         data_out.insert(data_out.end(), payload.begin(), payload.end());
 
