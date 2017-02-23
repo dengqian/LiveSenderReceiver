@@ -73,7 +73,7 @@ void recv_data::decoding(){
     }
 
     vector<uint8_t> data_out;
-    decode((uint8_t*)data_in, data_out, data_size); 
+    decode((uint8_t*)data_in, data_out); 
     decoded_data = (const char*)data_out.data();
 
     data.clear();
