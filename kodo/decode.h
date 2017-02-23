@@ -14,7 +14,7 @@
 
 
 
-int decode(uint8_t* data_in, std::vector<uint8_t>& data_out) 
+int decode(vector<char*> data_in, std::vector<uint8_t>& data_out) 
 {
 
 
@@ -35,8 +35,10 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out)
     std::vector<uint8_t> payload(payload_size);
 
     // Set the storage for the decoder
+    // data_out.resize(decoder.block_size());
+    // decoder.set_mutable_symbols(data_out.data(), decoder.block_size());
     data_out.resize(SEGMENT_SIZE);
-    decoder.set_mutable_symbols(data_out.data(), SEGMENT_SIZE);
+    decoder.set_mutable_symbols(data_out.data(),SEGMENT_SIZE); 
 
     // Keeps track of which symbols have been decoded
     std::vector<bool> decoded(symbols, false);
@@ -47,19 +49,20 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out)
     // Receiver loop
     while (!decoder.is_complete())
     {
-        cnt ++;
-        // std::cout<<"decoding phrase "<<cnt<<endl;
+        memcpy(payload.data(), data_in[cnt]+offset, payload_size); 
+        // offset += 8+payload_size;
 
-        memcpy(payload.data(), data_in+offset, payload_size); 
-        offset += 8+payload_size;
+        cnt ++;
+        std::cout<<"decoding phrase "<<cnt<<endl;
+
 
         // Packet got through - pass that packet to the decoder
         decoder.read_payload(payload.data());
 
-        if(cnt >= DECODE_BLOCK_NUM) {
-            std::cout << "Data decode failed!" << std::endl;
-            return 0;
-        }
+        // if(cnt >= DECODE_BLOCK_NUM) {
+        //     std::cout << "Data decode failed!" << std::endl;
+        //     return 0;
+        // }
 
         /*
         if (decoder.has_partial_decoding_interface() &&
