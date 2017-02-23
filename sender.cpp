@@ -15,6 +15,7 @@
 // #include "cc.h"
 // #include "test_util.h"
 #include "kodo/encode.h"
+#include "kodo/decode.h"
 #include "./common.h"
 #include "../src/common.h"
 #define EPSILON 1e-3
@@ -149,6 +150,10 @@ int main(int argc, char* argv[])
 		// cout << in.tellg() << ' ' << in.fail() << ' ' << in.eof() << endl;
         cout<<data_out.size()<<" bytes data encoded!"<<endl;
         cout<<"encoded_block_size:" << ENCODED_BLOCK_SIZE <<' '<< data_out.data()<<endl;		
+
+		vector<uint8_t> decode_data;
+		decode(data_out.data(), decode_data, DECODE_BLOCK_NUM);
+
 		//to do; compute factor
 
 		if ( sendrate1 > EPSILON && sendrate2 > EPSILON) {

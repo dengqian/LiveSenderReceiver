@@ -36,8 +36,6 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
     uint32_t payload_size = encoder.payload_size();
     std::vector<uint8_t> payload(payload_size);
     std::vector<uint8_t> data_in(data, data+SEGMENT_SIZE); 
-    // std::vector<uint8_t> data_out;
-
 
     const char* tag = "seg:";
     uint8_t* tag_t = (uint8_t*)tag;
@@ -47,15 +45,16 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
 	using std::cout;
 	using std::endl;
 
-    for (uint32_t i = 0; i < symbols*1.1; ++i)
+    //for (uint32_t i = 0; i < symbols*1.1; ++i)
+	while(cnt < symbols*1.1)
     {
         // Add a new symbol if the encoder rank is less than the maximum number
         // of symbols
 		cnt ++;
         rank = encoder.rank();
-		cout<<i<<" current rank: " << rank << endl;	
+		cout<<cnt<<" current rank: " << rank << endl;	
+
 		if (rank == last_rank && rank < symbols){
-			--i;
 			continue;
 		}
 
@@ -66,26 +65,19 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
             encoder.set_const_symbol(rank, symbol, encoder.symbol_size());
         }
 
-        //uint32_t bytes_used = encoder.write_payload(payload.data());
         encoder.write_payload(payload.data());
-        
-        // int len = data_out.size();
 
         uint8_t d[4] = {0};
         for (int i=0; i<4 ;++i){
             d[i] = ((uint8_t*)&segment_number)[i];
-			//std::cout<<int(d[i])<<std::endl;
 		}
 
         data_out.insert(data_out.end(), tag_t, tag_t+4);
-        // data_out.push_back(segment_number);
 		data_out.insert(data_out.end(), d, d+4);
         data_out.insert(data_out.end(), payload.begin(), payload.end());
 
 		last_rank = rank;
-
      }
-    // std::cout<<data_out.data()<<std::endl;
     
     return 0;
 }
