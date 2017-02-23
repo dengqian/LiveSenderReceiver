@@ -41,17 +41,17 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out)
     // Keeps track of which symbols have been decoded
     std::vector<bool> decoded(symbols, false);
 
-    uint32_t offset = 0;
+    uint32_t offset = 8;
     int cnt = 0;
 
     // Receiver loop
     while (!decoder.is_complete())
     {
         cnt ++;
-        std::cout<<"decoding phrase "<<cnt<<endl;
+        // std::cout<<"decoding phrase "<<cnt<<endl;
 
         memcpy(payload.data(), data_in+offset, payload_size); 
-        offset += payload_size;
+        offset += 8+payload_size;
 
         // Packet got through - pass that packet to the decoder
         decoder.read_payload(payload.data());
@@ -61,7 +61,7 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out)
             return 0;
         }
 
-        
+        /*
         if (decoder.has_partial_decoding_interface() &&
             decoder.is_partially_complete())
         {
@@ -76,7 +76,7 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out)
                 }
             }
         }
-        
+        */
 
         payload.clear();
     }
