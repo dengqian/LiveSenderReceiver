@@ -14,14 +14,12 @@
 
 
 
-int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num) 
+int decode(vector<char*> data_in, std::vector<uint8_t>& data_out) 
 {
 
 
     uint32_t symbol_size = BLOCK_SIZE;
     uint32_t symbols = BLOCK_NUM;
-
-    // std::cout<<symbols<<std::endl;
 
     // Initialize the factory with the chosen symbols and symbol size
     kodocpp::decoder_factory decoder_factory(
@@ -37,38 +35,35 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
     std::vector<uint8_t> payload(payload_size);
 
     // Set the storage for the decoder
-    // std::vector<uint8_t> data_out(decoder.block_size());
-    data_out.resize(decoder.block_size());
-
-    decoder.set_mutable_symbols(data_out.data(), decoder.block_size());
+    // data_out.resize(decoder.block_size());
+    // decoder.set_mutable_symbols(data_out.data(), decoder.block_size());
+    data_out.resize(SEGMENT_SIZE);
+    decoder.set_mutable_symbols(data_out.data(),SEGMENT_SIZE); 
 
     // Keeps track of which symbols have been decoded
-    // std::vector<bool> decoded(symbols, false);
+    std::vector<bool> decoded(symbols, false);
 
-    uint32_t offset = ENCODED_BLOCK_SIZE * (ENCODED_BLOCK_NUM-1) + 8;
-    uint32_t offset1 = 8; 
+    uint32_t offset = 8;
     int cnt = 0;
 
     // Receiver loop
     while (!decoder.is_complete())
     {
+        memcpy(payload.data(), data_in[cnt]+offset, payload_size); 
+        // offset += 8+payload_size;
+
         cnt ++;
         std::cout<<"decoding phrase "<<cnt<<endl;
 
-        memcpy(payload.data(), data_in+offset, payload_size); 
-        offset -= 8+payload_size;
 
         // Packet got through - pass that packet to the decoder
         decoder.read_payload(payload.data());
 
-        memcpy(payload.data(), data_in+offset1, payload_size); 
-        offset1 += 8+payload_size;
-        decoder.read_payload(payload.data());
+        // if(cnt >= DECODE_BLOCK_NUM) {
+        //     std::cout << "Data decode failed!" << std::endl;
+        //     return 0;
+        // }
 
-        if(cnt > DECODE_BLOCK_NUM) {
-            std::cout << "Data decode failed!" << std::endl;
-            return 0;
-        }
         /*
         if (decoder.has_partial_decoding_interface() &&
             decoder.is_partially_complete())
@@ -79,7 +74,7 @@ int decode(uint8_t* data_in, std::vector<uint8_t>& data_out, int num)
                 {
                     // Update that this symbol has been decoded,
                     // in a real application we could process that symbol
-                    // printf("Symbol %d was decoded\n", i);
+                    printf("Symbol %d was decoded\n", i);
                     decoded[i] = true;
                 }
             }

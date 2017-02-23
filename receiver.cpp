@@ -65,19 +65,13 @@ void recv_data::decoding(){
 
     int length = data_size * ENCODED_BLOCK_SIZE;
     
-    char* data_in = new char[length];
-    strcpy(data_in, data[0]);
-
-    for(int i=1; i<data_size; i++){
-        strcat(data_in, data[i]); 
-    }
-
     vector<uint8_t> data_out;
-    decode((uint8_t*)data_in, data_out, data_size); 
+    decode(data, data_out); 
     decoded_data = (const char*)data_out.data();
 
+    cout << decoded_data << endl;
+
     data.clear();
-    delete [] data_in;
 }
 
 
@@ -170,8 +164,8 @@ DWORD WINAPI recvdata(LPVOID usocket)
           if (start != data) cout << "block not integrated" << endl;
 
           memcpy(&seg_num, start + 4, sizeof(uint32_t));
-          buffer[seg_num].push_back(start+8);
-          cout << start << endl;
+          buffer[seg_num].push_back(data);
+          cout << data << endl;
           
           cout<< "form socket:" << recver << ", seg_num:" << seg_num << endl;
 

@@ -15,11 +15,10 @@
 #include "LiveSenderReceiver/common.h"
 #include <iostream>
 
-const int block_size = BLOCK_SIZE;
 
 int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_number)
 {
-    uint32_t symbol_size = block_size; // encode block size
+    uint32_t symbol_size = BLOCK_SIZE; // encode block size
     uint32_t symbols = BLOCK_NUM; // number of blocks to be encoded.
 
     if(symbols == 0) symbols = 1; // number of blocks can't be 0.
@@ -57,11 +56,12 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
 		if (rank == last_rank && rank < symbols){
 			continue;
 		}
+        cout << encoder.symbol_size() << endl;
 
         if (rank < encoder.symbols())
         {
             // Calculate the offset to the next symbol to insert
-            uint8_t* symbol = data_in.data() + rank * encoder.symbol_size();
+            uint8_t* symbol = data + rank * encoder.symbol_size();
             encoder.set_const_symbol(rank, symbol, encoder.symbol_size());
         }
 
