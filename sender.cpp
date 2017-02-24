@@ -64,30 +64,30 @@ void* pushdata(void* args)
 	   //UDT::perfmon(client, &perf);
 	   uint64_t last_time = CTimer::getTime();
        while(snd_size < it->end-it->begin) {
-         cout << "data size : " << it->end - it->begin <<endl; 
+         // cout << "data size : " << it->end - it->begin <<endl; 
 		  if (UDT::ERROR == (ss = UDT::send(client, \
                          it->data+it->begin+snd_size, it->end-it->begin-snd_size, 0)))
           {
              cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
              return 0 ;
           }
-		  cout << "snd_size : " << ss <<endl;
+		  // cout << "snd_size : " << ss <<endl;
           snd_size += ss;
           size += ss;
        }
 	   uint64_t time_used = CTimer::getTime() - last_time;
-	   cout << "send  data completed." << endl;
+	   // cout << "send  data completed." << endl;
 	   //UDT::perfmon(client, &perf);
 	   if (queue == &queue1){
 	       //sendrate1 = perf.mbpsSendRate;
 		   
 	       sendrate1 = snd_size * 8.0 / (time_used * 1000);
-		   cout << "sendrate1 : " << sendrate1 << endl;
+		   // cout << "sendrate1 : " << sendrate1 << endl;
 		}
 	   else if (queue == &queue2){
 	       //sendrate2 = perf.mbpsSendRate;
 	       sendrate2 = snd_size * 8.0 / (time_used * 1000);
-		   cout << "sendrate2 : " << sendrate2 << endl;
+		   // cout << "sendrate2 : " << sendrate2 << endl;
 	   }
    }
    return 0;
@@ -137,8 +137,11 @@ int main(int argc, char* argv[])
 	memset(buffer, 0, size);
     vector<uint8_t> data_out;
 
-    while(!in.fail() && !in.eof()) {
-        in.read(buffer, size); 
+    while(!in.eof()){
+		
+		in.read(buffer, size);
+       	cout << "buffer content:" << buffer << endl;
+		cout << "file eof state:" << in.eof() <<endl;
 
 		while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
 

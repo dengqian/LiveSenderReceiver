@@ -51,12 +51,12 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
         // of symbols
 		cnt ++;
         rank = encoder.rank();
-		cout<<cnt<<" current rank: " << rank << endl;	
+		// cout<<cnt<<" current rank: " << rank << endl;	
 
 		if (rank == last_rank && rank < symbols){
 			continue;
 		}
-        cout << encoder.symbol_size() << endl;
+        // cout << encoder.symbol_size() << endl;
 
         if (rank < encoder.symbols())
         {
