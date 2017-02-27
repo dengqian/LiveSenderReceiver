@@ -13,7 +13,7 @@
 #include <map>
 
 #include "kodo/decode.h"
-
+#include "hashlibpp.h"
 #include "common.h"
 
 using namespace std;
@@ -21,6 +21,7 @@ using namespace std;
 const char* cloud_server1 = "10.21.2.193";
 const char* cloud_server2 = "10.21.2.251";
 const char* cloud_server_port = SERVER_TO_RECEIVER_PORT;
+fstream outfile;
 
 void* recvdata(void*);
 // void* monitor(void*);
@@ -68,8 +69,18 @@ void recv_data::decoding(){
     vector<uint8_t> data_out;
     decode(data, data_out); 
     decoded_data = (const char*)data_out.data();
-
-    cout << decoded_data << endl;
+    hashwrapper *myWrapper = new md5wrapper();
+	try
+	{
+		string hash_res = myWrapper->getHashFromString(decoded_data);
+		outfile << hash_res << endl;
+	}
+	catch(hlException &e)
+	{
+		cerr << "Get Md5 Error" << endl; 
+	}
+	delete myWrapper; 
+    //cout << decoded_data << endl;
 
     data.clear();
 }
@@ -101,7 +112,7 @@ int main(int argc, char* argv[])
    // #else
    //    CreateThread(NULL, 0, monitor, &client2, 0, NULL);
    // #endif
-
+   outfile.open("recv_md5.txt", ios::out);
    #ifndef WIN32
       pthread_t rcvthread1, rcvthread2;
 
@@ -116,8 +127,7 @@ int main(int argc, char* argv[])
    #else
       CreateThread(NULL, 0, recvdata, new UDTSOCKET(recver), 0, NULL);
    #endif
-
-
+   outfile.close();
    UDT::close(client1);
    UDT::close(client2);
 
