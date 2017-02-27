@@ -18,8 +18,9 @@
 #include "kodo/decode.h"
 #include "./common.h"
 #include "../src/common.h"
+#include "hashlibpp.h"     //md5 lib
 #define EPSILON 1e-3
-#define FIXED_BW
+//#define FIXED_BW
 
 using namespace std;
 
@@ -127,7 +128,7 @@ int main(int argc, char* argv[])
 
     
     fstream in(argv[1], ios::in | ios::binary);
-
+	fstream out("segment_md5.txt", ios::out);
     const int size = SEGMENT_SIZE;
     uint32_t seg_num = 0;
     bool first_test = true;
@@ -136,13 +137,26 @@ int main(int argc, char* argv[])
 	char* buffer = new char[size];
 	memset(buffer, 0, size);
     vector<uint8_t> data_out;
-
+	int cnt = 1;
     while(!in.eof()){
 		
 		in.read(buffer, size);
-       	cout << "buffer content:" << buffer << endl;
-		cout << "file eof state:" << in.eof() <<endl;
-
+       	//cout << "buffer content:" << buffer << endl;
+		//cout << "file eof state:" << in.eof() <<endl;
+		// write every segment's md5 to file	
+		hashwrapper *myWrapper = new md5wrapper();
+		try
+		{
+			string hash_res = myWrapper->getHashFromString(buffer);
+			out << "cnt=" << cnt << "  :   "<< hash_res << endl;
+			cnt++;
+		}
+		catch(hlException &e)
+		{
+			cerr << "Get Md5 Error" << endl; 
+		}
+		delete myWrapper;
+		
 		while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
 
         data_out.clear();
@@ -212,7 +226,7 @@ int main(int argc, char* argv[])
     }
 
     in.close();
-   
+	out.close(); 
    UDT::close(client1);
    UDT::close(client2);
 
