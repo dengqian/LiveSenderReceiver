@@ -230,19 +230,19 @@ void* pushdata(void* usocket)
    char* data_addr = queue.front()->data;
 
    // init buffer block size can't exceed buffer_block_size.
-   if(s > buffer_block_size)
-   {
-       // cout<<"initial size:"<<s<<endl;
-       for(int i=0; i<s-buffer_block_size; i++){
-           item* it = queue.pop_front();
+   // if(s > buffer_block_size)
+   // {
+   //     // cout<<"initial size:"<<s<<endl;
+   //     for(int i=0; i<s-buffer_block_size; i++){
+   //         item* it = queue.pop_front();
 
-           if(it->data != data_addr){
-                char* data_pushed = data_addr;
-                delete [] data_pushed;
-                data_addr = it->data;
-           }
-       }
-   }
+   //         if(it->data != data_addr){
+   //              char* data_pushed = data_addr;
+   //              delete [] data_pushed;
+   //              data_addr = it->data;
+   //         }
+   //     }
+   // }
 
    while(true){
 
