@@ -67,7 +67,7 @@ test: test.o
 	$(C++) $^ -o $@ $(LDFLAGS)
 push_server: push_server.o
 	$(C++) $^ -o $@ $(LDFLAGS)
-sender: sender.o
+sender: sender.o ../src/common.o ../src/md5.o
 	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
 receiver: receiver.o
 	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
