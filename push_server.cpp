@@ -36,7 +36,7 @@ wqueue<item*> queue;
 
 int buff_size = ENCODED_BLOCK_SIZE;
 
-const int buffer_block_size = 100;
+const int buffer_block_size = 100000;
 
 void* recvdata(void *);
 void* pushdata(void *);
