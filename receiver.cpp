@@ -30,44 +30,49 @@ void* recvdata(void*);
 // when the number of data blocks is enough for decode, do decoding.
 class recv_data{
 public:
+    pthread_mutex_t  m_mutex;
+
     vector<char*> data;
+    vector<uint8_t> data_out;
     const char* decoded_data;
-    int data_size;
 
 public:
     recv_data() {
+        pthread_mutex_init(&m_mutex, NULL);
         decoded_data = 0;
     }
 
     ~recv_data(){
+        pthread_mutex_destroy(&m_mutex);
         for(auto it : data){
-            delete [] it;
+            delete it;
         }
-        delete [] decoded_data;
     }
 
     void push_back(char* item){
+        pthread_mutex_lock(&m_mutex);
         data.push_back(item);
+        pthread_mutex_unlock(&m_mutex);
     }
 
     int size(){
-        return data.size();
+        pthread_mutex_lock(&m_mutex);
+        int size = data.size();
+        pthread_mutex_unlock(&m_mutex);
+        return size; 
     }
 
-	void decoding();
+	int decoding();
 
 };
 
-void recv_data::decoding(){
+int recv_data::decoding(){
 
-    data_size = data.size();
+    int data_size = data.size();
+    int status = decode(data, data_out, data_size); 
 
-    if (data_size < DECODE_BLOCK_NUM) return;
-
-    int length = data_size * ENCODED_BLOCK_SIZE;
+    if(!status) return 0;
     
-    vector<uint8_t> data_out;
-    decode(data, data_out); 
     decoded_data = (const char*)data_out.data();
     hashwrapper *myWrapper = new md5wrapper();
 	try
@@ -80,14 +85,13 @@ void recv_data::decoding(){
 		cerr << "Get Md5 Error" << endl; 
 	}
 	delete myWrapper; 
-    //cout << decoded_data << endl;
 
-    data.clear();
+    return status;
 }
 
 
 
-map<uint32_t, recv_data>buffer; 
+map<uint32_t, recv_data> buffer; 
 
 
 int main(int argc, char* argv[])
@@ -134,6 +138,11 @@ int main(int argc, char* argv[])
    return 0;
 }
 
+void print_mapinfo(){
+    for(auto it : buffer){
+        cout << it.first << ' ' << it.second.size() << ' ' << endl;
+    }
+}
 
 #ifndef WIN32
 void* recvdata(void* usocket)
@@ -158,36 +167,38 @@ DWORD WINAPI recvdata(LPVOID usocket)
          if (UDT::ERROR == (rs = UDT::recv(recver, data+rsize, size-rsize, 0)))
          {
             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
-            break;
+            print_mapinfo();
+            return;
          }
 
          rsize += rs;
       }
 
       cout << "------------------------------------------" << endl;
-      cout<< "recved " << ENCODED_BLOCK_SIZE <<" bytes data."<< endl;
+      cout<< "recved " << rsize <<" bytes data."<< endl;
 
       uint32_t seg_num;
       char* start = 0;
 
       if((start = strstr(data, "seg:")) != NULL){
-          if (start != data) cout << "block not integrated" << endl;
 
           memcpy(&seg_num, start + 4, sizeof(uint32_t));
           buffer[seg_num].push_back(data);
-          cout << data << endl;
           
-          cout<< "form socket:" << recver << ", seg_num:" << seg_num << endl;
+          cout<< "from socket:" << recver << ", seg_num:" << seg_num << endl;
 
-          if(buffer[seg_num].size() == DECODE_BLOCK_NUM) {
+          if(buffer[seg_num].size() >= BLOCK_NUM && !buffer[seg_num].decoded_data) {
               
               cout<< "decoding segment: " << seg_num <<endl;
               buffer[seg_num].decoding();
-              cout << "seg " << seg_num << ":" << buffer[seg_num].data_size \
+              cout << "seg " << seg_num << ":" << buffer[seg_num].size()\
                   <<" blocks" << endl;
           }
 
           cout<<endl;
+      }
+      else{
+        cout << "seg: not found " << data << endl;
       }
 
    }
