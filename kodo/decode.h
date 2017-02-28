@@ -59,7 +59,7 @@ int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size)
         // offset += 8+payload_size;
 
         cnt ++;
-        std::cout<<"decoding phrase "<<cnt<<endl;
+        // std::cout<<"decoding phrase "<<cnt<<endl;
 
 
         // Packet got through - pass that packet to the decoder
