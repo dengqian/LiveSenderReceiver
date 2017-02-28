@@ -14,7 +14,7 @@
 
 
 
-int decode(vector<char*> data_in, std::vector<uint8_t>& data_out) 
+int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size) 
 {
 
 
@@ -49,6 +49,12 @@ int decode(vector<char*> data_in, std::vector<uint8_t>& data_out)
     // Receiver loop
     while (!decoder.is_complete())
     {
+        if(cnt >= size){
+            // std::cout<<"Data decode failed!"<<endl;
+            return 0;
+        }
+
+        std::cout<<cnt<<' ' <<data_in[cnt] <<endl;
         memcpy(payload.data(), data_in[cnt]+offset, payload_size); 
         // offset += 8+payload_size;
 
@@ -86,7 +92,7 @@ int decode(vector<char*> data_in, std::vector<uint8_t>& data_out)
 
     printf("Data decoded!\n");
 
-    return 0; 
+    return 1; 
 
 }
 
