@@ -80,8 +80,11 @@ int listen_to_client(const char* port, UDTSOCKET& server)
 
 }
 
-// void* accept_viewer(void* usocket){
-void* accept_viewer(UDTSOCKET client){
+void* accept_viewer(void* usocket){
+// void* accept_viewer(udtsocket client){
+    
+   UDTSOCKET client = *(UDTSOCKET*)usocket;
+   delete (UDTSOCKET*)usocket;
 
    sockaddr_storage clientaddr;
    int addrlen = sizeof(clientaddr);
@@ -199,7 +202,7 @@ void* pushdata(void* usocket)
    delete (UDTSOCKET*)usocket;
 
    int size = 0;
-   int s=queue.size();
+   // int s=queue.size();
 
    // init buffer block size can't exceed buffer_block_size.
    // if(s > buffer_block_size)
