@@ -80,9 +80,11 @@ int listen_to_client(const char* port, UDTSOCKET& server)
 
 }
 
-// void* accept_viewer(void* usocket){
-void* accept_viewer(UDTSOCKET client){
-
+void* accept_viewer(void* usocket){
+// void* accept_viewer(udtsocket client){
+    
+   UDTSOCKET client = *(UDTSOCKET*)usocket;
+   delete (UDTSOCKET*)usocket;
 
    sockaddr_storage clientaddr;
    int addrlen = sizeof(clientaddr);
@@ -137,7 +139,8 @@ int receive_from_client(UDTSOCKET serv)
    #ifndef WIN32
       pthread_t rcvthread;
       pthread_create(&rcvthread, NULL, recvdata, new UDTSOCKET(receiver_sock));
-      pthread_detach(rcvthread);
+      // pthread_detach(rcvthread);
+      pthread_join(rcvthread, NULL);
    #else
       CreateThread(NULL, 0, recvdata, new UDTSOCKET(receiver_sock), 0, NULL);
    #endif
@@ -168,9 +171,6 @@ DWORD WINAPI recvdata(LPVOID usocket)
 
       while (rsize < buff_size)
       {
-         // int rcv_size;
-         // int var_size = sizeof(int);
-         // UDT::getsockopt(receiver_sock, 0, UDT_RCVDATA, &rcv_size, &var_size);
 
          if (UDT::ERROR == (rs = UDT::recv(client, data + rsize, buff_size - rsize, 0)))
          {
@@ -178,32 +178,10 @@ DWORD WINAPI recvdata(LPVOID usocket)
             break;
          }
 
-         /*// send data directly.
-         int snd_size = 0;
-         int ss;
-         for(auto regist:regist_sock_list)
-         {
-         if(regist_sock_list.size() != 0)
-         { 
-            while(snd_size < rs) {
-               
-               if (UDT::ERROR == (ss = UDT::send(regist_sock, \
-                               data + rsize + snd_size, rs - snd_size, 0)))
-               {
-                  cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
-                  regist_sock_list.pop_back();
-                  break;
-               }
-               snd_size += ss;
-            }
-            cout<<rs<<"bytes data pushed"<<endl;
-         }*/
-
-         // add to shared buffer.
-        
          rsize += rs;
       }
       
+      // add to shared buffer.
       queue.add(new item(data, 0, rsize)); 
 
       if (rsize < buff_size)
@@ -225,24 +203,24 @@ void* pushdata(void* usocket)
    delete (UDTSOCKET*)usocket;
 
    int size = 0;
-   int s=queue.size();
-
-   char* data_addr = queue.front()->data;
+   // int s=queue.size();
 
    // init buffer block size can't exceed buffer_block_size.
-   if(s > buffer_block_size)
-   {
-       // cout<<"initial size:"<<s<<endl;
-       for(int i=0; i<s-buffer_block_size; i++){
-           item* it = queue.pop_front();
+   // if(s > buffer_block_size)
+   // {
+   //     // cout<<"initial size:"<<s<<endl;
+   //     for(int i=0; i<s-buffer_block_size; i++){
+   //         item* it = queue.pop_front();
 
-           if(it->data != data_addr){
-                char* data_pushed = data_addr;
-                delete [] data_pushed;
-                data_addr = it->data;
-           }
-       }
-   }
+   //         if(it->data != data_addr){
+   //              char* data_pushed = data_addr;
+   //              delete [] data_pushed;
+   //              data_addr = it->data;
+   //         }
+   //     }
+   // }
+
+   char* data_addr = queue.front()->data;
 
    while(true){
 
@@ -252,7 +230,7 @@ void* pushdata(void* usocket)
        if(it->data != data_addr){
            cout<< "queue size:" << queue.size() << " " <<size<<" bytes data pushed" <<endl;
            char* data_pushed = data_addr;
-           delete [] data_pushed;
+           delete data_pushed;
            data_addr = it->data;
        }
 
@@ -289,16 +267,16 @@ int main(int argc, char* argv[]){
     listen_to_client(upload_port, listen_to_uploader);
     listen_to_client(client_port, listen_to_regist);
 
-    // #ifndef WIN32
-    //    pthread_t accept_thread;
-    //    pthread_create(&accept_thread, NULL, accept_viewer, new UDTSOCKET(listen_to_regist));
-    //    pthread_detach(accept_thread);
-    // #else
-    //    CreateThread(NULL, 0, accept_viewer, new UDTSOCKET(listen_to_regist), 0, NULL);
-    // #endif
+    #ifndef WIN32
+       pthread_t accept_thread;
+       pthread_create(&accept_thread, NULL, accept_viewer, new UDTSOCKET(listen_to_regist));
+       pthread_detach(accept_thread);
+    #else
+       CreateThread(NULL, 0, accept_viewer, new UDTSOCKET(listen_to_regist), 0, NULL);
+    #endif
 
     receive_from_client(listen_to_uploader);
-    accept_viewer(listen_to_regist);
+    // accept_viewer(listen_to_regist);
 
     return 0;
 }
