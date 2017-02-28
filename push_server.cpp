@@ -139,7 +139,8 @@ int receive_from_client(UDTSOCKET serv)
    #ifndef WIN32
       pthread_t rcvthread;
       pthread_create(&rcvthread, NULL, recvdata, new UDTSOCKET(receiver_sock));
-      pthread_detach(rcvthread);
+      // pthread_detach(rcvthread);
+      pthread_join(rcvthread, NULL);
    #else
       CreateThread(NULL, 0, recvdata, new UDTSOCKET(receiver_sock), 0, NULL);
    #endif
