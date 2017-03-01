@@ -168,7 +168,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
          {
             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
             print_mapinfo();
-            return;
+			return 0;
          }
 
          rsize += rs;
