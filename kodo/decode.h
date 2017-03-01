@@ -54,13 +54,12 @@ int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size)
             return 0;
         }
 
-        std::cout<<cnt<<' ' <<data_in[cnt] <<endl;
+        // std::cout<<cnt<<' ' <<data_in[cnt] <<endl;
+        std::cout<<"decoding phrase "<<cnt<<endl;
         memcpy(payload.data(), data_in[cnt]+offset, payload_size); 
         // offset += 8+payload_size;
 
         cnt ++;
-        // std::cout<<"decoding phrase "<<cnt<<endl;
-
 
         // Packet got through - pass that packet to the decoder
         decoder.read_payload(payload.data());
