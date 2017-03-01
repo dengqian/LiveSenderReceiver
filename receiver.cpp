@@ -33,7 +33,6 @@ public:
     pthread_mutex_t  m_mutex;
 
     vector<char*> data;
-    vector<uint8_t> data_out;
     const char* decoded_data;
 
 public:
@@ -69,11 +68,14 @@ public:
 int recv_data::decoding(){
 
     int data_size = data.size();
+    vector<uint8_t> data_out;
     int status = decode(data, data_out, data_size); 
 
     if(!status) return 0;
     
     decoded_data = (const char*)data_out.data();
+    // cout << "decoded_data" << decoded_data << endl;
+
     hashwrapper *myWrapper = new md5wrapper();
 	try
 	{
@@ -167,7 +169,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
          if (UDT::ERROR == (rs = UDT::recv(recver, data+rsize, size-rsize, 0)))
          {
             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
-            print_mapinfo();
+            // print_mapinfo();
             return 0;
          }
 
@@ -185,9 +187,11 @@ DWORD WINAPI recvdata(LPVOID usocket)
           memcpy(&seg_num, start + 4, sizeof(uint32_t));
           buffer[seg_num].push_back(data);
           
-          cout<< "from socket:" << recver << ", seg_num:" << seg_num << endl;
+          cout<< "from socket:" << recver << ", seg_num:" << seg_num << ' ' << \
+              buffer[seg_num].size() << endl;
 
-          if(buffer[seg_num].size() >= BLOCK_NUM && !buffer[seg_num].decoded_data) {
+          // if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].decoded_data==0) {
+          if(buffer[seg_num].size() == ENCODED_BLOCK_NUM){
               
               cout<< "decoding segment: " << seg_num <<endl;
               buffer[seg_num].decoding();
