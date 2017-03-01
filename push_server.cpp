@@ -10,6 +10,7 @@
 #endif
 
 #include <vector>
+#include <unordered_map>
 #include <iostream>
 #include <udt.h>
 
@@ -33,6 +34,7 @@ UDTSOCKET receiver_sock;
 vector<UDTSOCKET> regist_sock_list;
 UDTSOCKET regist_sock;
 wqueue<item*> queue;
+unordered_map<int, int> m;
 
 int buff_size = ENCODED_BLOCK_SIZE;
 
@@ -182,6 +184,13 @@ DWORD WINAPI recvdata(LPVOID usocket)
       }
       
       // add to shared buffer.
+      if(strstr(data, "seg:") != NULL ){
+        int seg_num;
+        m[seg_num]++;
+
+        memcpy(&seg_num, data+4, sizeof(int));
+        cout<<seg_num<<' '<<m[seg_num]<<endl;
+      }
       queue.add(new item(data, 0, rsize)); 
 
       if (rsize < buff_size)
@@ -228,7 +237,7 @@ void* pushdata(void* usocket)
 
        // pointer changed, delete data from queue.
        if(it->data != data_addr){
-           cout<< "queue size:" << queue.size() << " " <<size<<" bytes data pushed" <<endl;
+           // cout<< "queue size:" << queue.size() << " " <<size<<" bytes data pushed" <<endl;
            char* data_pushed = data_addr;
            delete data_pushed;
            data_addr = it->data;
