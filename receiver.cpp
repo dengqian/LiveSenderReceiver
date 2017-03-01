@@ -169,7 +169,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
          if (UDT::ERROR == (rs = UDT::recv(recver, data+rsize, size-rsize, 0)))
          {
             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
-            print_mapinfo();
+            // print_mapinfo();
             return 0;
          }
 
