@@ -167,8 +167,8 @@ DWORD WINAPI recvdata(LPVOID usocket)
          if (UDT::ERROR == (rs = UDT::recv(recver, data+rsize, size-rsize, 0)))
          {
             cout << "recv:" << UDT::getlasterror().getErrorMessage() << endl;
-            print_mapinfo();
-			return 0;
+            // print_mapinfo();
+            return 0;
          }
 
          rsize += rs;
@@ -185,9 +185,11 @@ DWORD WINAPI recvdata(LPVOID usocket)
           memcpy(&seg_num, start + 4, sizeof(uint32_t));
           buffer[seg_num].push_back(data);
           
-          cout<< "from socket:" << recver << ", seg_num:" << seg_num << endl;
+          cout<< "from socket:" << recver << ", seg_num:" << seg_num << ' ' << \
+              buffer[seg_num].size() << endl;
 
-          if(buffer[seg_num].size() >= BLOCK_NUM && !buffer[seg_num].decoded_data) {
+          // if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].decoded_data==0) {
+          if(buffer[seg_num].size() == ENCODED_BLOCK_NUM){
               
               cout<< "decoding segment: " << seg_num <<endl;
               buffer[seg_num].decoding();
