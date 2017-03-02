@@ -17,7 +17,6 @@
 int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size) 
 {
 
-
     uint32_t symbol_size = BLOCK_SIZE;
     uint32_t symbols = BLOCK_NUM;
 
@@ -35,8 +34,6 @@ int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size)
     std::vector<uint8_t> payload(payload_size);
 
     // Set the storage for the decoder
-    // data_out.resize(decoder.block_size());
-    // decoder.set_mutable_symbols(data_out.data(), decoder.block_size());
     data_out.resize(SEGMENT_SIZE);
     decoder.set_mutable_symbols(data_out.data(),SEGMENT_SIZE); 
 
@@ -54,37 +51,13 @@ int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size)
             return 0;
         }
 
-        // std::cout<<cnt<<' ' <<data_in[cnt] <<endl;
-        std::cout<<"decoding phrase "<<cnt<<endl;
+        // std::cout<<"decoding phrase "<<cnt<<endl;
         memcpy(payload.data(), data_in[cnt]+offset, payload_size); 
-        // offset += 8+payload_size;
 
         cnt ++;
 
         // Packet got through - pass that packet to the decoder
         decoder.read_payload(payload.data());
-
-        // if(cnt >= DECODE_BLOCK_NUM) {
-        //     std::cout << "Data decode failed!" << std::endl;
-        //     return 0;
-        // }
-
-        /*
-        if (decoder.has_partial_decoding_interface() &&
-            decoder.is_partially_complete())
-        {
-            for (uint32_t i = 0; i < decoder.symbols(); ++i)
-            {
-                if (!decoded[i] && decoder.is_symbol_uncoded(i))
-                {
-                    // Update that this symbol has been decoded,
-                    // in a real application we could process that symbol
-                    printf("Symbol %d was decoded\n", i);
-                    decoded[i] = true;
-                }
-            }
-        }
-        */
 
         payload.clear();
     }
