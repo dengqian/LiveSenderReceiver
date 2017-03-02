@@ -21,7 +21,7 @@
 #include "../src/common.h"
 #include "hashlibpp.h"     //md5 lib
 #define EPSILON 1e-3
-#define FIXED_BW
+//#define FIXED_BW
 
 using namespace std;
 
@@ -62,42 +62,42 @@ void* pushdata(void* args)
  
 	unordered_map<int, int> m;
    int size = 0;
-
+   uint64_t last_time = 0;
    while(true){
        item* it = queue->pop_front();
        int snd_size = 0;
        int ss = 0;
-	   //UDT::TRACEINFO perf;
-	   //UDT::perfmon(client, &perf);
-	   uint64_t last_time = CTimer::getTime();
-
+	   UDT::TRACEINFO perf;
+	   UDT::perfmon(client, &perf);
+		last_time = CTimer::getTime();
+		uint64_t cur_time = last_time / 1000;
+		
 
        while(snd_size < it->data.size()) {
-          // cout << "data size : " << it->end - it->begin <<endl; 
 		  if (UDT::ERROR == (ss = UDT::send(client, \
                          (const char*)it->data.data()+snd_size, it->data.size()-snd_size, 0)))
           {
              cout << "send:" << UDT::getlasterror().getErrorMessage() << endl;
              return 0 ;
           }
-		  // cout << "snd_size : " << ss <<endl;
           snd_size += ss;
           size += ss;
        }
 	   uint64_t time_used = CTimer::getTime() - last_time;
-	   // cout << "send  data completed." << endl;
-	   //UDT::perfmon(client, &perf);
+	   UDT::perfmon(client, &perf);
 	   if (queue == &queue1){
-	       //sendrate1 = perf.mbpsSendRate;
-	       sendrate1 = snd_size * 8.0 / (time_used * 1000);
-			// cout<<"link 1 :" << seg_num<< ' ' << m[seg_num] << ' ' << queue->size() << endl;
-		   //cout << "sendrate1 : " << sendrate1 << endl;
+	       sendrate1 = perf.mbpsBandwidth;
+	       //sendrate1 = snd_size * 8.0 / (time_used * 1000);
+		   // cout<<"link 1 :" << seg_num<< ' ' << m[seg_num] << ' ' << queue->size() << endl;
+		   cout << "rate1 : " << sendrate1 <<  endl;
+			cout << cur_time << endl;
 		}
 	   else if (queue == &queue2){
-	       //sendrate2 = perf.mbpsSendRate;
-	       sendrate2 = snd_size * 8.0 / (time_used * 1000);
-			// cout<<"link 2 :" << seg_num<< ' ' << m[seg_num] << ' ' << queue->size() << endl;
-		   //cout << "sendrate2 : " << sendrate2 << endl;
+	       sendrate2 = perf.mbpsBandwidth;
+	       //sendrate2 = snd_size * 8.0 / (time_used * 1000);
+		   // cout<<"link 2 :" << seg_num<< ' ' << m[seg_num] << ' ' << queue->size() << endl;
+		   cout << "rate2 : " << sendrate2 <<  endl;
+			cout << cur_time << endl;
 	   }
    }
    return 0;
@@ -149,8 +149,6 @@ int main(int argc, char* argv[])
     while(!in.eof()){
 		
 		in.read(buffer, size);
-       	//cout << "buffer content:" << buffer << endl;
-		//cout << "file eof state:" << in.eof() <<endl;
 		// write every segment's md5 to file	
 		hashwrapper *myWrapper = new md5wrapper();
 		try
@@ -167,13 +165,10 @@ int main(int argc, char* argv[])
 		
 		vector<uint8_t> data_out;
 		encode((uint8_t*) buffer, data_out, seg_num++);
-        // const char* data = (const char*)data_out.data();
-
 		cout << "-----------------------------------------" << endl;
-		// cout << in.tellg() << ' ' << in.fail() << ' ' << in.eof() << endl;
-        cout<<data_out.size()<<" bytes data encoded!"<<endl;
+        //cout<<data_out.size()<<" bytes data encoded!"<<endl;
 		cout << "segment number:" << seg_num << endl;
-        cout<<" encoded_block_num:" << ENCODED_BLOCK_NUM <<endl;		
+        //cout<<" encoded_block_num:" << ENCODED_BLOCK_NUM <<endl;		
 
 		while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
 
@@ -207,8 +202,8 @@ int main(int argc, char* argv[])
 		factor1 = 2;
 		factor2 = 1;
 		#endif
-		cout << "factor1 : " << factor1 << endl;
-		cout << "factor2 : " << factor2 << endl;
+		//cout << "factor1 : " << factor1 << endl;
+		//cout << "factor2 : " << factor2 << endl;
 		if (sendrate1 < -EPSILON && sendrate2 < -EPSILON){
 			queue1.add(new item(data_out, 0, SEGMENT_SIZE));
 			queue2.add(new item(data_out, 0, SEGMENT_SIZE));  
