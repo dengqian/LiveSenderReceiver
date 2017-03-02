@@ -15,6 +15,7 @@
 #include "kodo/decode.h"
 #include "hashlibpp.h"
 #include "common.h"
+#include "../src/common.h"
 
 using namespace std;
 
@@ -28,20 +29,19 @@ void* recvdata(void*);
 
 // received data will be put into a map, with key seg_num, value block data char*.
 // when the number of data blocks is enough for decode, do decoding.
-class recv_data{
+class rcvdDataItem{
 public:
     pthread_mutex_t  m_mutex;
-
     vector<char*> data;
     const char* decoded_data;
 
 public:
-    recv_data() {
+    rcvdDataItem() {
         pthread_mutex_init(&m_mutex, NULL);
         decoded_data = 0;
     }
 
-    ~recv_data(){
+    ~rcvdDataItem(){
         pthread_mutex_destroy(&m_mutex);
         for(auto it : data){
             delete it;
@@ -65,7 +65,7 @@ public:
 
 };
 
-int recv_data::decoding(){
+int rcvdDataItem::decoding(){
 
     int data_size = data.size();
     vector<uint8_t> data_out;
@@ -93,7 +93,7 @@ int recv_data::decoding(){
 
 
 
-map<uint32_t, recv_data> buffer; 
+map<uint32_t, rcvdDataItem> buffer; 
 
 
 int main(int argc, char* argv[])
@@ -190,13 +190,15 @@ DWORD WINAPI recvdata(LPVOID usocket)
           cout<< "from socket:" << recver << ", seg_num:" << seg_num << ' ' << \
               buffer[seg_num].size() << endl;
 
-          // if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].decoded_data==0) {
-          if(buffer[seg_num].size() == BLOCK_NUM){
+          if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].decoded_data==0) {
+          // if(buffer[seg_num].size() == ENCODED_BLOCK_NUM){
               
               cout<< "decoding segment: " << seg_num <<endl;
-              buffer[seg_num].decoding();
-              cout << "seg " << seg_num << ":" << buffer[seg_num].size()\
-                  <<" blocks" << endl;
+              int decodeStatus = buffer[seg_num].decoding();
+              if(decodeStatus == 1) {
+                  uint64_t cur_time = CTimer::getTime()/1e3;
+                  cout << "seg " << seg_num << " decoded at time: " << cur_time << endl;
+              }
           }
 
           cout<<endl;
