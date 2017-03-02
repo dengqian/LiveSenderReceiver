@@ -189,7 +189,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
               buffer[seg_num].size() << endl;
 
           // if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].decoded_data==0) {
-          if(buffer[seg_num].size() == ENCODED_BLOCK_NUM){
+          if(buffer[seg_num].size() == BLOCK_NUM){
               
               cout<< "decoding segment: " << seg_num <<endl;
               buffer[seg_num].decoding();
