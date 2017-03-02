@@ -33,7 +33,6 @@ public:
     pthread_mutex_t  m_mutex;
 
     vector<char*> data;
-    vector<uint8_t> data_out;
     const char* decoded_data;
 
 public:
@@ -69,11 +68,14 @@ public:
 int recv_data::decoding(){
 
     int data_size = data.size();
+    vector<uint8_t> data_out;
     int status = decode(data, data_out, data_size); 
 
     if(!status) return 0;
     
     decoded_data = (const char*)data_out.data();
+    // cout << "decoded_data" << decoded_data << endl;
+
     hashwrapper *myWrapper = new md5wrapper();
 	try
 	{
