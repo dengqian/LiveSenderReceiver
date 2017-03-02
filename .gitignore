@@ -6,7 +6,6 @@
 *.a
 *.log
 *.swp
-.*
 *.dat
 *.txt
 
