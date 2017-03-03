@@ -46,8 +46,8 @@ public:
 wqueue<item*> queue1;
 wqueue<item*> queue2;
 
-volatile double sendrate1 = -1.0;
-volatile double sendrate2 = -1.0;
+volatile double sendrate1 = 1;
+volatile double sendrate2 = 1;
 
 struct ARGS{
 	UDTSOCKET usocket;
@@ -65,7 +65,7 @@ void* pushdata(void* args)
    uint64_t last_time = 0;
    while(true){
        item* it = queue->pop_front();
-       int snd_size = 0;
+       uint32_t snd_size = 0;
        int ss = 0;
 	   UDT::TRACEINFO perf;
 	   UDT::perfmon(client, &perf);
@@ -83,7 +83,7 @@ void* pushdata(void* args)
           snd_size += ss;
           size += ss;
        }
-	   uint64_t time_used = CTimer::getTime() - last_time;
+	   //uint64_t time_used = CTimer::getTime() - last_time;
 	   UDT::perfmon(client, &perf);
 	   if (queue == &queue1){
 	       sendrate1 = perf.mbpsBandwidth;
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
 	fstream out("segment_md5.txt", ios::out);
     const int size = SEGMENT_SIZE;
     uint32_t seg_num = 0;
-    bool first_test = true;
+    //bool first_test = true;
 	int factor1 = 1, factor2 = 1;  //default trasmit data with 1:1
 
 	char* buffer = new char[size];
@@ -167,7 +167,7 @@ int main(int argc, char* argv[])
 		encode((uint8_t*) buffer, data_out, seg_num++);
 		cout << "-----------------------------------------" << endl;
         //cout<<data_out.size()<<" bytes data encoded!"<<endl;
-		cout << "segment number:" << seg_num << endl;
+		cout << "segment number:" << seg_num -1 << endl;
         //cout<<" encoded_block_num:" << ENCODED_BLOCK_NUM <<endl;		
 
 		while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
@@ -204,24 +204,21 @@ int main(int argc, char* argv[])
 		#endif
 		//cout << "factor1 : " << factor1 << endl;
 		//cout << "factor2 : " << factor2 << endl;
-		if (sendrate1 < -EPSILON && sendrate2 < -EPSILON){
-			queue1.add(new item(data_out, 0, SEGMENT_SIZE));
-			queue2.add(new item(data_out, 0, SEGMENT_SIZE));  
-		}
-		else {
-			int num1 = int((double)ENCODED_BLOCK_NUM * ((double)factor1/(factor1+factor2))+0.5);
-			cout << "block num of link1 : " << num1 <<endl;
-			int datasize1 = ENCODED_BLOCK_SIZE * num1;	
-			int datasize2 = ENCODED_BLOCK_SIZE * (ENCODED_BLOCK_NUM - num1);
-			queue1.add(new item(data_out, 0, datasize1));
-			queue2.add(new item(data_out, datasize1, datasize1+datasize2));  
-		}
-		
+		//if (sendrate1 < -EPSILON && sendrate2 < -EPSILON){
+		//	queue1.add(new item(data_out, 0, SEGMENT_SIZE));
+		//	queue2.add(new item(data_out, 0, SEGMENT_SIZE));  
+		//}
+		int num1 = int((double)ENCODED_BLOCK_NUM * ((double)factor1/(factor1+factor2))+0.5);
+		cout << "block num of link1 : " << num1 <<endl;
+		int datasize1 = ENCODED_BLOCK_SIZE * num1;	
+		int datasize2 = ENCODED_BLOCK_SIZE * (ENCODED_BLOCK_NUM - num1);
+		queue1.add(new item(data_out, 0, datasize1));
+		queue2.add(new item(data_out, datasize1, datasize1+datasize2));  
 		// first sending is a link-rate test
-		if ( first_test ){
-			first_test = false;
-			in.seekg(0, ios::beg);
-		}
+		//if ( first_test ){
+		//	first_test = false;
+		//	in.seekg(0, ios::beg);
+		//}
     }
 
     in.close();
