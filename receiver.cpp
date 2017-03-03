@@ -66,7 +66,7 @@ public:
 };
 
 int rcvdDataItem::decoding(){
-
+    cout << "begin decoding" << endl;
     int data_size = data.size();
     vector<uint8_t> data_out;
     isDecoded = decode(data, data_out, data_size); 
