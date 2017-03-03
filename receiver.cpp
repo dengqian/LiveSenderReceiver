@@ -33,12 +33,12 @@ class rcvdDataItem{
 public:
     pthread_mutex_t  m_mutex;
     vector<char*> data;
-    const char* decoded_data;
+    int isDecoded;
 
 public:
     rcvdDataItem() {
         pthread_mutex_init(&m_mutex, NULL);
-        decoded_data = 0;
+        isDecoded = 0;
     }
 
     ~rcvdDataItem(){
@@ -69,17 +69,16 @@ int rcvdDataItem::decoding(){
 
     int data_size = data.size();
     vector<uint8_t> data_out;
-    int status = decode(data, data_out, data_size); 
+    isDecoded = decode(data, data_out, data_size); 
+    cout << "decode status:" << isDecoded << endl;
 
-    if(!status) return 0;
+    if(!isDecoded) return 0;
     
-    decoded_data = (const char*)data_out.data();
-    // cout << "decoded_data" << decoded_data << endl;
 
     hashwrapper *myWrapper = new md5wrapper();
 	try
 	{
-		string hash_res = myWrapper->getHashFromString(decoded_data);
+		string hash_res = myWrapper->getHashFromString((const char*)data_out.data());
 		outfile << hash_res << endl;
 	}
 	catch(hlException &e)
@@ -88,7 +87,7 @@ int rcvdDataItem::decoding(){
 	}
 	delete myWrapper; 
 
-    return status;
+    return 1;
 }
 
 
@@ -190,8 +189,8 @@ DWORD WINAPI recvdata(LPVOID usocket)
           cout<< "from socket:" << recver << ", seg_num:" << seg_num << ' ' << \
               buffer[seg_num].size() << endl;
 
-          if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].decoded_data==0) {
-          // if(buffer[seg_num].size() == ENCODED_BLOCK_NUM){
+          // if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].isDecoded==0) {
+          if(buffer[seg_num].size() == BLOCK_NUM){
               
               cout<< "decoding segment: " << seg_num <<endl;
               int decodeStatus = buffer[seg_num].decoding();
