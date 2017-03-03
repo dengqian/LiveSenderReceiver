@@ -67,10 +67,18 @@ public:
 
 int rcvdDataItem::decoding(){
 
+    pthread_mutex_lock(&m_mutex);
+    if(isDecoded) {
+        cout << "data has been decoded!" << endl;
+        pthread_mutex_lock(&m_mutex);
+        return 1;
+    }
+
     int data_size = data.size();
     vector<uint8_t> data_out;
     isDecoded = decode(data, data_out, data_size); 
     cout << "decode status:" << isDecoded << endl;
+    pthread_mutex_unlock(&m_mutex);
 
     if(!isDecoded) return 0;
     
@@ -189,13 +197,13 @@ DWORD WINAPI recvdata(LPVOID usocket)
           cout<< "from socket:" << recver << ", seg_num:" << seg_num << ' ' << \
               buffer[seg_num].size() << endl;
 
-          // if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].isDecoded==0) {
-          if(buffer[seg_num].size() == BLOCK_NUM){
+          if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].isDecoded==0) {
+          // if(buffer[seg_num].size() == BLOCK_NUM){
               
               cout<< "decoding segment: " << seg_num <<endl;
               int decodeStatus = buffer[seg_num].decoding();
               if(decodeStatus == 1) {
-                  uint64_t cur_time = CTimer::getTime()/1e3;
+                  uint64_t cur_time = CTimer::getTime() / 1000 % 1000000;
                   cout << "seg " << seg_num << " decoded at time: " << cur_time << endl;
               }
           }
