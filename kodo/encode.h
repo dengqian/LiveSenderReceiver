@@ -15,6 +15,16 @@
 #include "LiveSenderReceiver/common.h"
 #include <iostream>
 
+kodocpp::encoder_factory encoder_factory(
+    kodocpp::codec::on_the_fly,
+    kodocpp::field::binary8,
+    BLOCK_NUM, BLOCK_SIZE);
+
+kodocpp::encoder encoder = encoder_factory.build();
+uint32_t payload_size = encoder.payload_size();
+
+const char* tag = "seg:";
+uint8_t* tag_t = (uint8_t*)tag;
 
 int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_number)
 {
@@ -24,20 +34,11 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
     if(symbols == 0) symbols = 1; // number of blocks can't be 0.
 
     // Initialize the factory with the chosen symbols and symbol size
-    kodocpp::encoder_factory encoder_factory(
-        kodocpp::codec::on_the_fly,
-        kodocpp::field::binary8,
-        symbols, symbol_size);
-
-    kodocpp::encoder encoder = encoder_factory.build();
 
     // Create the buffer needed for the payload
-    uint32_t payload_size = encoder.payload_size();
     std::vector<uint8_t> payload(payload_size);
     std::vector<uint8_t> data_in(data, data+SEGMENT_SIZE); 
 
-    const char* tag = "seg:";
-    uint8_t* tag_t = (uint8_t*)tag;
 	uint32_t last_rank = -1, rank = 0;
 	int cnt = 0;
 	

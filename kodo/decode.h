@@ -13,24 +13,20 @@
 #include "LiveSenderReceiver/common.h"
 
 
+// Initialize the factory with the chosen symbols and symbol size
+kodocpp::decoder_factory decoder_factory(
+    kodocpp::codec::on_the_fly,
+    kodocpp::field::binary8,
+    BLOCK_NUM, BLOCK_SIZE);
+
+kodocpp::decoder decoder = decoder_factory.build();
+
 
 int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size) 
+// int decode(char* data_in, std::vector<uint8_t>& data_out, int size) 
 {
 
-    uint32_t symbol_size = BLOCK_SIZE;
-    uint32_t symbols = BLOCK_NUM;
-
-    // Initialize the factory with the chosen symbols and symbol size
-    kodocpp::decoder_factory decoder_factory(
-        kodocpp::codec::on_the_fly,
-        kodocpp::field::binary8,
-        symbols, symbol_size);
-
-    kodocpp::decoder decoder = decoder_factory.build();
-
-    // Create the buffer needed for the payload
     uint32_t payload_size = decoder.payload_size();
-    std::cout<<"payload_size:"<<payload_size<<'\n';
     std::vector<uint8_t> payload(payload_size);
 
     // Set the storage for the decoder
@@ -38,7 +34,7 @@ int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size)
     decoder.set_mutable_symbols(data_out.data(),SEGMENT_SIZE); 
 
     // Keeps track of which symbols have been decoded
-    std::vector<bool> decoded(symbols, false);
+    // std::vector<bool> decoded(BLOCK_NUM, false);
 
     uint32_t offset = 8;
     int cnt = 0;

@@ -21,6 +21,8 @@ using namespace std;
 
 const char* cloud_server1 = "10.21.2.193";
 const char* cloud_server2 = "10.21.2.251";
+// const char* cloud_server1 = "139.199.94.164";
+// const char* cloud_server2 = "139.199.165.244";
 const char* cloud_server_port = SERVER_TO_RECEIVER_PORT;
 fstream outfile;
 
@@ -69,7 +71,7 @@ int rcvdDataItem::decoding(){
 
     pthread_mutex_lock(&m_mutex);
     if(isDecoded) {
-        cout << "data has been decoded!" << endl;
+        // cout << "data has been decoded!" << endl;
         pthread_mutex_lock(&m_mutex);
         return 1;
     }
@@ -77,7 +79,7 @@ int rcvdDataItem::decoding(){
     int data_size = data.size();
     vector<uint8_t> data_out;
     isDecoded = decode(data, data_out, data_size); 
-    cout << "decode status:" << isDecoded << endl;
+    // cout << "decode status:" << isDecoded << endl;
     pthread_mutex_unlock(&m_mutex);
 
     if(!isDecoded) return 0;
@@ -184,7 +186,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
       }
 
       cout << "------------------------------------------" << endl;
-      cout<< "recved " << rsize <<" bytes data."<< endl;
+      // cout<< "recved " << rsize <<" bytes data."<< endl;
 
       uint32_t seg_num;
       char* start = 0;
@@ -194,13 +196,13 @@ DWORD WINAPI recvdata(LPVOID usocket)
           memcpy(&seg_num, start + 4, sizeof(uint32_t));
           buffer[seg_num].push_back(data);
           
-          cout<< "from socket:" << recver << ", seg_num:" << seg_num << ' ' << \
+          // cout<< "from socket:" << recver << ", seg_num:" << seg_num << ' ' << \
               buffer[seg_num].size() << endl;
 
           if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].isDecoded==0) {
           // if(buffer[seg_num].size() == BLOCK_NUM){
               
-              cout<< "decoding segment: " << seg_num <<endl;
+              // cout<< "decoding segment: " << seg_num <<endl;
               int decodeStatus = buffer[seg_num].decoding();
               if(decodeStatus == 1) {
                   uint64_t cur_time = CTimer::getTime() / 1000 % 1000000;

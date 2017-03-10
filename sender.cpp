@@ -144,7 +144,6 @@ int main(int argc, char* argv[])
 	int factor1 = 1, factor2 = 1;  //default trasmit data with 1:1
 
 	char* buffer = new char[size];
-	memset(buffer, 0, size);
 	int cnt = 1;
     while(!in.eof()){
 		
