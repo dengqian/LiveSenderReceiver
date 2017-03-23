@@ -9,5 +9,7 @@
 *.dat
 *.txt
 .*
+*.ts
+*.mp4
 !.gitignore
 

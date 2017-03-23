@@ -43,11 +43,11 @@ int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size)
     while (!decoder.is_complete())
     {
         if(cnt >= size){
-            // std::cout<<"Data decode failed!"<<endl;
+            std::cout<<cnt<<" Data decode failed!"<<endl;
             return 0;
         }
 
-        // std::cout<<"decoding phrase "<<cnt<<endl;
+        std::cout<<"decoding phrase "<<cnt<<endl;
         memcpy(payload.data(), data_in[cnt]+offset, payload_size); 
 
         cnt ++;

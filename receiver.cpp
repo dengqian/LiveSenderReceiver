@@ -25,6 +25,8 @@ const char* cloud_server2 = "10.21.2.251";
 // const char* cloud_server2 = "139.199.165.244";
 const char* cloud_server_port = SERVER_TO_RECEIVER_PORT;
 fstream outfile;
+fstream videofile("recv.ts", fstream::app);
+
 
 void* recvdata(void*);
 // void* monitor(void*);
@@ -83,6 +85,7 @@ int rcvdDataItem::decoding(){
     pthread_mutex_unlock(&m_mutex);
 
     if(!isDecoded) return 0;
+    videofile.write((const char*)data_out.data(), data_out.size());
     
 
     hashwrapper *myWrapper = new md5wrapper();
@@ -196,7 +199,7 @@ DWORD WINAPI recvdata(LPVOID usocket)
           memcpy(&seg_num, start + 4, sizeof(uint32_t));
           buffer[seg_num].push_back(data);
           
-          // cout<< "from socket:" << recver << ", seg_num:" << seg_num << ' ' << \
+          cout<< "from socket:" << recver << ", seg_num:" << seg_num << ' ' << \
               buffer[seg_num].size() << endl;
 
           if(buffer[seg_num].size() >= BLOCK_NUM && buffer[seg_num].isDecoded==0) {
