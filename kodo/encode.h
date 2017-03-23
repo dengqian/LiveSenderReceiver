@@ -77,7 +77,8 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
         data_out.insert(data_out.end(), payload.begin(), payload.end());
 
 		last_rank = rank;
-     }
+    }
+    cout << "encoded data:" << data_out.data() << endl;
     
     return 0;
 }
