@@ -25,7 +25,7 @@ const char* cloud_server2 = "10.21.2.251";
 // const char* cloud_server2 = "139.199.165.244";
 const char* cloud_server_port = SERVER_TO_RECEIVER_PORT;
 fstream outfile;
-fstream videofile("recv.ts", fstream::app);
+fstream videofile("recv.mp4", ios::out);
 
 
 void* recvdata(void*);
@@ -85,8 +85,8 @@ int rcvdDataItem::decoding(){
     pthread_mutex_unlock(&m_mutex);
 
     if(!isDecoded) return 0;
+    cout << "buffer:" << data_out.data() << endl;
     videofile.write((const char*)data_out.data(), data_out.size());
-    
 
     hashwrapper *myWrapper = new md5wrapper();
 	try

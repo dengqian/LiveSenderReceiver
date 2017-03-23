@@ -13,19 +13,21 @@
 #include "LiveSenderReceiver/common.h"
 
 
-// Initialize the factory with the chosen symbols and symbol size
-kodocpp::decoder_factory decoder_factory(
-    kodocpp::codec::on_the_fly,
-    kodocpp::field::binary8,
-    BLOCK_NUM, BLOCK_SIZE);
-
-kodocpp::decoder decoder = decoder_factory.build();
 
 
 int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size) 
 // int decode(char* data_in, std::vector<uint8_t>& data_out, int size) 
 {
 
+   
+    // Initialize the factory with the chosen symbols and symbol size
+    kodocpp::decoder_factory decoder_factory(
+        kodocpp::codec::on_the_fly,
+        kodocpp::field::binary8,
+        BLOCK_NUM, BLOCK_SIZE);
+    
+    kodocpp::decoder decoder = decoder_factory.build();
+    
     uint32_t payload_size = decoder.payload_size();
     std::vector<uint8_t> payload(payload_size);
 
