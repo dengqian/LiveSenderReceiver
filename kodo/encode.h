@@ -16,6 +16,9 @@
 #include <iostream>
 
 
+const char* tag = "seg:";
+uint8_t* tag_t = (uint8_t*)tag;
+
 int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_number)
 {
     uint32_t symbol_size = BLOCK_SIZE; // encode block size
@@ -27,17 +30,15 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
     kodocpp::encoder_factory encoder_factory(
         kodocpp::codec::on_the_fly,
         kodocpp::field::binary8,
-        symbols, symbol_size);
-
+        BLOCK_NUM, BLOCK_SIZE);
+    
     kodocpp::encoder encoder = encoder_factory.build();
+    uint32_t payload_size = encoder.payload_size();
 
     // Create the buffer needed for the payload
-    uint32_t payload_size = encoder.payload_size();
     std::vector<uint8_t> payload(payload_size);
     std::vector<uint8_t> data_in(data, data+SEGMENT_SIZE); 
 
-    const char* tag = "seg:";
-    uint8_t* tag_t = (uint8_t*)tag;
 	uint32_t last_rank = -1, rank = 0;
 	int cnt = 0;
 	
