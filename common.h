@@ -12,8 +12,8 @@
 #include "test_util.h"
 
 
-const int SEGMENT_SIZE = 1024*4*20;
-const int BLOCK_SIZE = 1024*4;
+const int BLOCK_SIZE = 1316;
+const int SEGMENT_SIZE = BLOCK_SIZE*10;
 const int BLOCK_NUM = SEGMENT_SIZE / BLOCK_SIZE;
 const int DECODE_BLOCK_NUM = BLOCK_NUM * 1.1;
 const int ENCODED_BLOCK_NUM = BLOCK_NUM * 1.1;
