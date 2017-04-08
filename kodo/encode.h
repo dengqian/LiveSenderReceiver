@@ -46,7 +46,7 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
 	using std::endl;
 
     //for (uint32_t i = 0; i < symbols*1.1; ++i)
-	while(cnt < symbols*1.1)
+	while(cnt < ENCODED_BLOCK_NUM)
     {
         // Add a new symbol if the encoder rank is less than the maximum number
         // of symbols

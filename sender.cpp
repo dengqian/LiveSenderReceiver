@@ -34,6 +34,7 @@
 #include "hashlibpp.h"     //md5 lib
 #define EPSILON 1e-3
 //#define FIXED_BW
+#define PORT 5004
 
 using namespace std;
 
@@ -78,7 +79,7 @@ void* pushdata(void* args)
 	unordered_map<int, int> m;
    int size = 0;
    uint64_t last_time = 0;
-	uint32_t seg_num = 0;
+   uint32_t seg_num = 0;
    while(true){
        item* it = queue->pop_front();
        uint32_t snd_size = 0;
@@ -118,126 +119,14 @@ void* pushdata(void* args)
    }
    return 0;
 }
-static int xioctl(int fd, int request, void *arg)
-{
-    int r;
-    do r = ioctl (fd, request, arg);
-    while (-1 == r && EINTR == errno);
-    return r;
-}
-
-int getStreamFromCam(){
-    int fd;
-    fd = open("/dev/video0", O_RDWR);
-    if (fd == -1)
-    {
-        // couldn't find capture device
-        perror("Opening Video device");
-        return 1;
-    }
-    struct v4l2_capability caps = {0};
-    if (-1 == xioctl(fd, VIDIOC_QUERYCAP, &caps))
-    {
-        perror("Querying Capabilites");
-        return 1;
-    }
-    if(!(caps.capabilities & V4L2_CAP_VIDEO_CAPTURE)){
-        fprintf(stderr, "The device does not handle single-planar video capture.\n");
-        exit(1);
-    }
-
-    // set format
-#ifndef V4L2_PIX_FMT_H264
-#define V4L2_PIX_FMT_H264     v4l2_fourcc('H', '2', '6', '4') /* H264 with start codes */
-#endif
-    struct v4l2_format fmt;
-    fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    fmt.fmt.pix.width       = 640; //replace
-    fmt.fmt.pix.height      = 480; //replace
-    fmt.fmt.pix.pixelformat = V4L2_PIX_FMT_H264; //replace
-    if(ioctl(fd, VIDIOC_S_FMT, &fmt) < 0){
-        perror("VIDIOC_S_FMT");
-        exit(1);
-    }
-    // request buffers 
-    struct v4l2_requestbuffers bufrequest;
-    bufrequest.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    bufrequest.memory = V4L2_MEMORY_MMAP;
-    bufrequest.count = 4;
-     
-    if(ioctl(fd, VIDIOC_REQBUFS, &bufrequest) < 0){
-        perror("VIDIOC_REQBUFS");
-        exit(1);
-    }
-
-    // map cache buffer to bufferinfo
-   
-    struct v4l2_buffer buf;  
-    memset(&buf,0,sizeof(buf));  
-    buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;  
-    buf.memory = V4L2_MEMORY_MMAP;  
-    buf.index = 0;  
-    if (-1 == ioctl(fd, VIDIOC_QUERYBUF, &buf))  
-        exit(-1);  
-
-    // 映射内存  
-    void* buffer_start = mmap (NULL,buf.length,PROT_READ | PROT_WRITE ,MAP_SHARED,fd, buf.m.offset);  
-    if (MAP_FAILED==buffer_start){
-        perror("mmap");
-        exit(-1);  
-    }
-
-    struct v4l2_buffer bufferinfo;  
-    bufferinfo.type =V4L2_BUF_TYPE_VIDEO_CAPTURE;  
-    bufferinfo.memory =V4L2_MEMORY_MMAP;  
-    bufferinfo.index = 1;  
-    ioctl (fd,VIDIOC_QBUF, &bufferinfo);  
     
-    int type =V4L2_BUF_TYPE_VIDEO_CAPTURE;  
-    ioctl (fd,VIDIOC_STREAMON, &type);
-    
-    int cnt = 0;
-    while(cnt++ < 100){
-        if(ioctl(fd, VIDIOC_DQBUF, &bufferinfo) < 0){
-            perror("VIDIOC_QBUF");
-            exit(1);
-        }
-        
-        bufferinfo.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-        bufferinfo.memory = V4L2_MEMORY_MMAP;
-             // 图像处理  
-        int jpgfile;
-        ofstream outfile ("new.mp4",ofstream::app);
-        // if((jpgfile = open("/tmp/myimage.jpeg", O_WRONLY | O_CREAT, 0660)) < 0){
-        //     perror("open");
-        //     exit(1);
-        // }
-         
-        outfile.write((const char*)buffer_start, bufferinfo.length);
-        cout << (const char*) buffer_start << endl;
-        // Queue the next one.
-        if(ioctl(fd, VIDIOC_QBUF, &bufferinfo) < 0){
-            perror("VIDIOC_QBUF");
-            exit(1);
-        }
-    }
-    // Deactivate streaming
-    if(ioctl(fd, VIDIOC_STREAMOFF, &type) < 0){
-        perror("VIDIOC_STREAMOFF");
-        exit(1);
-    }
-
- 
-}
-
-
 int main(int argc, char* argv[])
 {
-   if (2 != argc)
-   {
-      cout << "usage: sender filename" << endl;
-      return 0;
-   }
+   // if (2 != argc)
+   // {
+   //    cout << "usage: sender filename" << endl;
+   //    return 0;
+   // }
 
    UDTSOCKET client1, client2;
    createUDTSocket(client1, "9000");
@@ -262,52 +151,50 @@ int main(int argc, char* argv[])
    #endif
 
     
-    fstream in(argv[1], ios::in | ios::binary);
+    // fstream in(argv[1], ios::in | ios::binary);
 	fstream out("segment_md5.txt", ios::out);
     const int size = SEGMENT_SIZE;
     uint32_t seg_num = 0;
     //bool first_test = true;
 	int factor1 = 1, factor2 = 1;  //default trasmit data with 1:1
 
-	char* buffer = new char[size];
-	memset(buffer, 0, size);
+	char* buffer = new char[BLOCK_SIZE];
 	int cnt = 1;
     // getStreamFromCam();
+    
+    // udp recv from vlc  
+    int sockfd,len;  
+    struct sockaddr_in addr;  
+    int addr_len = sizeof(struct sockaddr_in);  
+    /*建立socket*/  
+    if((sockfd=socket(AF_INET,SOCK_DGRAM,0))<0){  
+        perror ("socket");  
+        exit(1);  
+    }  
+    /*填写sockaddr_in 结构*/  
+    bzero ( &addr, sizeof(addr) );  
+    addr.sin_family=AF_INET;  
+    addr.sin_port=htons(PORT);  
+    addr.sin_addr.s_addr=htonl(INADDR_ANY) ;  
+    if (bind(sockfd, (struct sockaddr *)&addr, sizeof(addr))<0){  
+        perror("connect");  
+        exit(1);  
+    }  
     vector<char> buf;
+    int bufflen = 0;
+    char *databuff = new char[size];
 
-    //while(!in.eof()){
-    in.seekg(0, ios::end);
-    int last_len = 0;
-    int cur_len = in.tellg();
-    //in.seekg(0, ios::beg);
-    int new_len = cur_len-last_len;
+
     while(true){
-        while(cur_len == last_len){
-		    in.seekg(0, ios::end);
-            cur_len = in.tellg(); 
-        }
-        new_len = cur_len - last_len;
-        last_len = cur_len;
-        cout << "new_len:" << new_len << endl;
 
-        in.seekg(-new_len, ios::cur);
-        char* tmp_buf = new char[new_len];
-        in.read(tmp_buf, new_len);
-        // in.seekg(0, ios::end);
-
-        buf.insert(buf.end(), tmp_buf, tmp_buf+new_len);
-
-        while(size < buf.size()){
-            copy(buf.begin(), buf.begin()+size, buffer); 
-            buf.erase(buf.begin(), buf.begin()+size);
-            // cout << "buffer:" << buffer << endl;
-
+        while(bufflen < size){
+            len = recvfrom(sockfd, buffer, BLOCK_SIZE, 0 , (struct sockaddr *)&addr ,(socklen_t*)&addr_len);
             // write every segment's md5 to file	
 		    hashwrapper *myWrapper = new md5wrapper();
 		    try
 		    {
 		    	string hash_res = myWrapper->getHashFromString(buffer);
-		    	out << "cnt=" << cnt << "  :   "<< hash_res << endl;
+		    	out << hash_res << endl;
 		    	cnt++;
 		    }
 		    catch(hlException &e)
@@ -316,70 +203,77 @@ int main(int argc, char* argv[])
 		    }
 		    delete myWrapper;
 
-		    		    
-		    vector<uint8_t> data_out;
-		    encode((uint8_t*) buffer, data_out, seg_num++);
-            
-            cout << "-----------------------------------------" << endl;
-            //cout<<data_out.size()<<" bytes data encoded!"<<endl;
-		    cout << "segment number:" << seg_num -1 << endl;
-            cout << "encoded data size:" << data_out.size() <<endl;
-            //cout<<" encoded_block_num:" << ENCODED_BLOCK_NUM <<endl;		
-
-		    while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
-
-		    //to do; compute factor
-
-		    if ( sendrate1 > EPSILON && sendrate2 > EPSILON) {
-		        double res = sendrate1 > sendrate2 ? sendrate1 / sendrate2 : sendrate2 / sendrate1;
-		    	if (sendrate1 > sendrate2){
-		    		factor1 = (int)(res + 0.5);
-		    		factor2 = 1;
-		    		if (factor1 > 10){
-		    			factor1 = BLOCK_NUM; 
-		    			factor2 = ENCODED_BLOCK_NUM - BLOCK_NUM;   // the mbps gap is too large , so transmit on only one link, the other link only transmit the redundant data
-		    		}
-		    	}
-		    	else{
-		    		factor1 = 1;
-		    		factor2 = (int)(res + 0.5);
-		    		if (factor2 > 10){
-		    			factor1 = ENCODED_BLOCK_NUM - BLOCK_NUM;
-		    			factor2 = BLOCK_NUM;
-		    		}
-		    	}
-		    }
-		    else{
-		    	factor1 = factor2 = 1;
-		    }
-		    
-		    sendrate1 = sendrate2 = 0;
-		    #ifdef FIXED_BW
-		    factor1 = 2;
-		    factor2 = 1;
-		    #endif
-		    //cout << "factor1 : " << factor1 << endl;
-		    //cout << "factor2 : " << factor2 << endl;
-		    //if (sendrate1 < -EPSILON && sendrate2 < -EPSILON){
-		    //	queue1.add(new item(data_out, 0, SEGMENT_SIZE));
-		    //	queue2.add(new item(data_out, 0, SEGMENT_SIZE));  
-		    //}
-		    int num1 = int((double)ENCODED_BLOCK_NUM * ((double)factor1/(factor1+factor2))+0.5);
-		    cout << "block num of link1 : " << num1 <<endl;
-		    int datasize1 = ENCODED_BLOCK_SIZE * num1;	
-		    int datasize2 = ENCODED_BLOCK_SIZE * (ENCODED_BLOCK_NUM - num1);
-		    queue1.add(new item(data_out, 0, datasize1));
-		    queue2.add(new item(data_out, datasize1, datasize1+datasize2));  
-		    // first sending is a link-rate test
-		    //if ( first_test ){
-		    //	first_test = false;
-		    //	in.seekg(0, ios::beg);
-		    //}
+//cout << "recv len : "<< len;   
+            bufflen += len;
+            buf.insert(buf.end(), buffer, buffer+len);
+            cout << "recv from udp len:" << bufflen << endl;
         }
-        delete tmp_buf;
+         
+        copy(buf.begin(), buf.begin()+size, databuff); 
+        buf.erase(buf.begin(), buf.begin()+size);
+        bufflen -= size ;
+
+        				    
+		vector<uint8_t> data_out;
+		encode((uint8_t*) databuff, data_out, seg_num++);
+        
+        cout << "-----------------------------------------" << endl;
+        //cout<<data_out.size()<<" bytes data encoded!"<<endl;
+		cout << "segment number:" << seg_num -1 << endl;
+        cout << "encoded data size:" << data_out.size() <<endl;
+        //cout<<" encoded_block_num:" << ENCODED_BLOCK_NUM <<endl;		
+
+	    while( sendrate1 <= EPSILON && sendrate1 >= -EPSILON && sendrate2 <= EPSILON && sendrate2 >= -EPSILON);
+
+		//to do; compute factor
+
+		if ( sendrate1 > EPSILON && sendrate2 > EPSILON) {
+		    double res = sendrate1 > sendrate2 ? sendrate1 / sendrate2 : sendrate2 / sendrate1;
+			if (sendrate1 > sendrate2){
+				factor1 = (int)(res + 0.5);
+				factor2 = 1;
+				if (factor1 > 10){
+					factor1 = BLOCK_NUM; 
+					factor2 = ENCODED_BLOCK_NUM - BLOCK_NUM;   // the mbps gap is too large , so transmit on only one link, the other link only transmit the redundant data
+				}
+			}
+			else{
+				factor1 = 1;
+				factor2 = (int)(res + 0.5);
+				if (factor2 > 10){
+					factor1 = ENCODED_BLOCK_NUM - BLOCK_NUM;
+					factor2 = BLOCK_NUM;
+				}
+			}
+		}
+		else{
+			factor1 = factor2 = 1;
+		}
+		
+		sendrate1 = sendrate2 = 0;
+		#ifdef FIXED_BW
+		factor1 = 2;
+		factor2 = 1;
+		#endif
+		//cout << "factor1 : " << factor1 << endl;
+		//cout << "factor2 : " << factor2 << endl;
+		//if (sendrate1 < -EPSILON && sendrate2 < -EPSILON){
+		//	queue1.add(new item(data_out, 0, SEGMENT_SIZE));
+		//	queue2.add(new item(data_out, 0, SEGMENT_SIZE));  
+		//}
+		int num1 = int((double)ENCODED_BLOCK_NUM * ((double)factor1/(factor1+factor2))+0.5);
+		cout << "block num of link1 : " << num1 <<endl;
+		int datasize1 = ENCODED_BLOCK_SIZE * num1;	
+		int datasize2 = ENCODED_BLOCK_SIZE * (ENCODED_BLOCK_NUM - num1);
+		queue1.add(new item(data_out, 0, datasize1));
+		queue2.add(new item(data_out, datasize1, datasize1+datasize2));  
+		// first sending is a link-rate test
+		//if ( first_test ){
+		//	first_test = false;
+		//	in.seekg(0, ios::beg);
+		//}
     }
     
-    in.close();
 	out.close(); 
     UDT::close(client1);
     UDT::close(client2);
