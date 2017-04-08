@@ -11,11 +11,16 @@
 
 #include <iostream>
 #include <map>
+#include <arpa/inet.h>
+
 
 #include "kodo/decode.h"
 #include "hashlibpp.h"
 #include "common.h"
 #include "../src/common.h"
+
+#define UDP_SENT_IP "10.24.0.105"
+#define UDP_SENT_PORT 1234
 
 using namespace std;
 
@@ -27,6 +32,8 @@ const char* cloud_server_port = SERVER_TO_RECEIVER_PORT;
 fstream outfile;
 fstream videofile("recv.mp4", ios::out);
 
+int decoded_num = -1;
+
 
 void* recvdata(void*);
 // void* monitor(void*);
@@ -37,6 +44,7 @@ class rcvdDataItem{
 public:
     pthread_mutex_t  m_mutex;
     vector<char*> data;
+    vector<uint8_t> decoded_data;
     int isDecoded;
 
 public:
@@ -65,6 +73,12 @@ public:
         return size; 
     }
 
+    int get_decode_status(){
+        pthread_mutex_lock(&m_mutex);
+        return isDecoded;
+        pthread_mutex_unlock(&m_mutex);
+    }
+
 	int decoding();
 
 };
@@ -81,11 +95,12 @@ int rcvdDataItem::decoding(){
     int data_size = data.size();
     vector<uint8_t> data_out;
     isDecoded = decode(data, data_out, data_size); 
+    decoded_data = data_out;
     // cout << "decode status:" << isDecoded << endl;
     pthread_mutex_unlock(&m_mutex);
 
     if(!isDecoded) return 0;
-    cout << "buffer:" << data_out.data() << endl;
+    // cout << "buffer:" << data_out.data() << endl;
     videofile.write((const char*)data_out.data(), data_out.size());
 
     hashwrapper *myWrapper = new md5wrapper();
@@ -169,6 +184,21 @@ DWORD WINAPI recvdata(LPVOID usocket)
 
    const int size = ENCODED_BLOCK_SIZE;
 
+    int sockfd;  
+    struct sockaddr_in addr;  
+    int addr_len = sizeof(struct sockaddr_in);  
+    /*建立socket*/  
+    if((sockfd=socket(AF_INET,SOCK_DGRAM,0))<0){  
+        perror ("socket");  
+        exit(1);  
+    }  
+    /*填写sockaddr_in 结构*/  
+    bzero ( &addr, sizeof(addr) );  
+    addr.sin_family=AF_INET;  
+    addr.sin_port = htons(UDP_SENT_PORT);  
+    addr.sin_addr.s_addr = inet_addr(UDP_SENT_IP) ;  
+
+    
    while (true)
    {
       int rs;
@@ -210,6 +240,11 @@ DWORD WINAPI recvdata(LPVOID usocket)
               if(decodeStatus == 1) {
                   uint64_t cur_time = CTimer::getTime() / 1000 % 1000000;
                   cout << "seg " << seg_num << " decoded at time: " << cur_time << endl;
+                    for (int i=0; i<BLOCK_NUM; i++){
+                       int send_len =  sendto(sockfd, buffer[seg_num].decoded_data.data()+i*BLOCK_SIZE, BLOCK_SIZE, 0, (struct sockaddr *)&addr, addr_len);
+                        // cout << "send len : " << send_len << endl;
+                        // cout << "send pos : " <<  buffer[seg_num].decoded_data.data()+i*BLOCK_SIZE<< endl;
+                    }
               }
           }
 

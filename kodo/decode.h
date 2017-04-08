@@ -13,8 +13,6 @@
 #include "LiveSenderReceiver/common.h"
 
 
-
-
 int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size) 
 // int decode(char* data_in, std::vector<uint8_t>& data_out, int size) 
 {
@@ -48,7 +46,7 @@ int decode(vector<char*> data_in, std::vector<uint8_t>& data_out, int size)
             return 0;
         }
 
-        std::cout<<"decoding phrase "<<cnt<<endl;
+        // std::cout<<"decoding phrase "<<cnt<<endl;
         memcpy(payload.data(), data_in[cnt]+offset, payload_size); 
 
         cnt ++;
