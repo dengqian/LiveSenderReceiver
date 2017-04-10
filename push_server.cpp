@@ -188,11 +188,11 @@ DWORD WINAPI recvdata(LPVOID usocket)
       // add to shared buffer.
       if(strstr(data, "seg:") != NULL ){
         int seg_num;
-        m[seg_num]++;
-
         memcpy(&seg_num, data+4, sizeof(int));
+        m[seg_num]++;
         cout<<seg_num<<' '<<m[seg_num]<<endl;
       }
+
       queue.add(new item(data, 0, rsize)); 
 
       if (rsize < buff_size)
