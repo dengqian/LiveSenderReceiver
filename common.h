@@ -15,20 +15,22 @@
 const int BLOCK_SIZE = 1316;
 const int SEGMENT_SIZE = BLOCK_SIZE*10;
 const int BLOCK_NUM = SEGMENT_SIZE / BLOCK_SIZE;
-const int DECODE_BLOCK_NUM = BLOCK_NUM * 1.1;
-const int ENCODED_BLOCK_NUM = BLOCK_NUM * 1.1;
-// 4 bytes for seg:, 4 bytes for seg_num
-const int ENCODED_BLOCK_SIZE = BLOCK_SIZE+BLOCK_NUM+9+4+4;
+// 
+#define REDUNDENCY 1.1
+const int ENCODED_BLOCK_NUM = BLOCK_NUM * REDUNDENCY;
+const int DECODE_BLOCK_NUM = BLOCK_NUM * REDUNDENCY;
 
+// BLOCK_NUM+9 fixed overhead, and 4 bytes for "seg:", 4 bytes for seg_num
+const int ENCODED_BLOCK_SIZE = BLOCK_SIZE+BLOCK_NUM+9+4+4;
 
 using namespace std;
 
 const char* SENDER_TO_SERVER_PORT = "9090";
 const char* SERVER_TO_RECEIVER_PORT = "9000";
 
-const int g_serverNum = 2;  // num of cloud server
+// const int g_serverNum = 2;  // num of cloud server
 
-
+// routine to create a UDT socket with the given local port
 int createUDTSocket(UDTSOCKET& usock, const char* local_port)
 {
    struct addrinfo hints, *local;
@@ -57,6 +59,7 @@ int createUDTSocket(UDTSOCKET& usock, const char* local_port)
    return 1;
 }
 
+// routine to connect to server
 int connect(UDTSOCKET& usock, const char *server_ip, const char* port)
 {
    addrinfo hints, *peer;
@@ -84,6 +87,7 @@ int connect(UDTSOCKET& usock, const char *server_ip, const char* port)
    return 1;
 }
 
+// monitor on send performance
 #ifndef WIN32
 void* monitor(void* s)
 #else

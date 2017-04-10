@@ -30,7 +30,7 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
     kodocpp::encoder_factory encoder_factory(
         kodocpp::codec::on_the_fly,
         kodocpp::field::binary8,
-        BLOCK_NUM, BLOCK_SIZE);
+        symbols, symbol_size);
     
     kodocpp::encoder encoder = encoder_factory.build();
     uint32_t payload_size = encoder.payload_size();
@@ -45,7 +45,6 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
 	using std::cout;
 	using std::endl;
 
-    //for (uint32_t i = 0; i < symbols*1.1; ++i)
 	while(cnt < ENCODED_BLOCK_NUM)
     {
         // Add a new symbol if the encoder rank is less than the maximum number
@@ -57,7 +56,6 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
 		if (rank == last_rank && rank < symbols){
 			continue;
 		}
-        // cout << encoder.symbol_size() << endl;
 
         if (rank < encoder.symbols())
         {
@@ -66,20 +64,22 @@ int encode(uint8_t* data, std::vector<uint8_t>& data_out, uint32_t segment_numbe
             encoder.set_const_symbol(rank, symbol, encoder.symbol_size());
         }
 
+        // write a encoded payload to data_out 
         encoder.write_payload(payload.data());
 
+        // insert segment number for each block
         uint8_t d[4] = {0};
         for (int i=0; i<4 ;++i){
             d[i] = ((uint8_t*)&segment_number)[i];
 		}
-
         data_out.insert(data_out.end(), tag_t, tag_t+4);
 		data_out.insert(data_out.end(), d, d+4);
         data_out.insert(data_out.end(), payload.begin(), payload.end());
 
 		last_rank = rank;
     }
-    cout << "encoded data:" << data_out.data() << endl;
+
+    // cout << "encoded data:" << data_out.data() << endl;
     
     return 0;
 }
