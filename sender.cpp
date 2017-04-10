@@ -47,12 +47,8 @@ const char* cloud_server_port = SENDER_TO_SERVER_PORT;
 class item{
 public:
     vector<uint8_t> data;
-    // int begin;
-    // int end;
 
     item(vector<uint8_t>& content, int start, int end){
-		// vector<uint8_t> tmp(content.begin()+start, content.begin()+end);
-		// data = tmp;
         data.insert(data.end(), content.begin()+start, content.begin()+end);
 	}
 	
@@ -119,13 +115,13 @@ void* pushdata(void* args)
             sendrate1 = perf.mbpsBandwidth;
             //sendrate1 = snd_size * 8.0 / (time_used * 1000);
      	    cout << "rate1 : " << sendrate1 <<  endl;
-            cout << "segment " << seg_num << "sent at time " << cur_time << endl;
+            cout << "segment " << seg_num << " sent at time " << cur_time << endl;
      	}
         else if (queue == &queue2){
             sendrate2 = perf.mbpsBandwidth;
             //sendrate2 = snd_size * 8.0 / (time_used * 1000);
      	    cout << "rate2 : " << sendrate2 <<  endl;
-            cout << "segment " << seg_num << "sent at time " << cur_time << endl;
+            cout << "segment " << seg_num << " sent at time " << cur_time << endl;
         }
     }
     return 0;
