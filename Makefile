@@ -42,7 +42,7 @@ endif
 
 DIR = $(shell pwd)
 
-APP = appserver appclient sendfile recvfile test push_server sender receiver 
+APP = push_server sender receiver 
 # APP = sender 
 
 all: $(APP)
@@ -55,23 +55,12 @@ KODOFLAGS = -Wl,-Bdynamic -lkodoc -Wl,-rpath .
 %.o : %.cpp common.h 
 	$(C++) $(CCFLAGS) $< -c
 
-appserver: appserver.o
-	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
-appclient: appclient.o
-	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
-sendfile: sendfile.o
-	$(C++) $^ -o $@ $(LDFLAGS)
-recvfile: recvfile.o
-	$(C++) $^ -o $@ $(LDFLAGS)
-test: test.o
-	$(C++) $^ -o $@ $(LDFLAGS)
 push_server: push_server.o
 	$(C++) $^ -o $@ $(LDFLAGS)
 sender: sender.o ../src/common.o ../src/md5.o
 	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
 receiver: receiver.o ../src/common.o ../src/md5.o
 	$(C++) $^ -o $@ $(LDFLAGS) $(KODOFLAGS)
-
 	
 clean:
 	rm -f *.o $(APP)
